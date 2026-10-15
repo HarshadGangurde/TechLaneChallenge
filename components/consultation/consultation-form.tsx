@@ -220,7 +220,7 @@ export function ConsultationForm() {
 
         {/* Honeypot: hidden from people and assistive tech, bots fill it in. */}
         <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-          <label>Website<input tabIndex={-1} autoComplete="off" name="website" value={form.website} onChange={(e) => set("website", e.target.value)} /></label>
+          <label>Leave this field empty<input tabIndex={-1} autoComplete="off" name="hp_ref_code" data-lpignore="true" data-1p-ignore="true" data-form-type="other" value={form.website} onChange={(e) => set("website", e.target.value)} /></label>
         </div>
 
         <Button type="submit" disabled={submitting} className="w-full text-lg">

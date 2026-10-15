@@ -156,3 +156,16 @@ describe("saveLead", () => {
     expect(gw.appendRow).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("headerRowStatus", () => {
+  it("recognises a matching header, a data-only sheet and a mismatched header", async () => {
+    const { headerRowStatus, SHEET_HEADERS } = await import("@/lib/lead-storage");
+    expect(headerRowStatus([...SHEET_HEADERS])).toBe("match");
+    expect(headerRowStatus(undefined)).toBe("none");
+    expect(headerRowStatus(["L-ABC123", "2026-10-25"])).toBe("none");
+    const bad: string[] = [...SHEET_HEADERS];
+    bad[4] = "E-mail";
+    expect(headerRowStatus(bad)).toBe("mismatch");
+    expect(headerRowStatus([SHEET_HEADERS[0]])).toBe("mismatch");
+  });
+});

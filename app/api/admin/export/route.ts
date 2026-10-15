@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { ConfigError, getAdminToken, getSheetsConfig } from "@/lib/config";
 import { toCsv } from "@/lib/csv";
 import { createSheetsGateway } from "@/lib/google-sheets";
-import { SHEET_HEADERS } from "@/lib/lead-storage";
+import { headerRowStatus, SHEET_HEADERS } from "@/lib/lead-storage";
 import { clientIp, createRateLimiter } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -42,7 +42,15 @@ export async function GET(request: Request) {
 
   try {
     const rows = await createSheetsGateway(getSheetsConfig()).readRows();
-    const data = rows[0]?.[0] === SHEET_HEADERS[0] ? rows.slice(1) : rows;
+    const status = headerRowStatus(rows[0]);
+    if (status === "mismatch") {
+      console.error("[export] sheet header row does not match the expected columns A-R");
+      return NextResponse.json(
+        { error: "The sheet's header row does not match the expected columns. Fix row 1 (see SETUP.md) and try again." },
+        { status: 500, headers: noStore },
+      );
+    }
+    const data = status === "match" ? rows.slice(1) : rows;
     const csv = "﻿" + toCsv(SHEET_HEADERS, data.map((r) => SHEET_HEADERS.map((_, i) => r[i] ?? "")));
     const day = new Date().toISOString().slice(0, 10);
     return new NextResponse(csv, {

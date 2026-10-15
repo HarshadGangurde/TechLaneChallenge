@@ -107,6 +107,14 @@ export interface SaveResult {
 
 // Remembers leads saved by this instance so a double-tap never re-appends.
 const recentLeadIds = new Set<string>();
+const MAX_RECENT_LEADS = 10_000;
+function rememberLead(id: string) {
+  if (recentLeadIds.size >= MAX_RECENT_LEADS) {
+    const oldest = recentLeadIds.values().next().value;
+    if (oldest !== undefined) recentLeadIds.delete(oldest);
+  }
+  recentLeadIds.add(id);
+}
 export function _resetRecentLeadsForTests() {
   recentLeadIds.clear();
 }
@@ -137,11 +145,11 @@ export async function saveLead(
       // Always look first: a previous request (maybe on another instance, maybe
       // one that timed out after Google accepted it) may already have written it.
       if (await leadExists(gateway, record.leadId).catch(() => false)) {
-        recentLeadIds.add(record.leadId);
+        rememberLead(record.leadId);
         return { leadId: record.leadId, duplicate: true };
       }
       await gateway.appendRow(recordToRow(record));
-      recentLeadIds.add(record.leadId);
+      rememberLead(record.leadId);
       return { leadId: record.leadId, duplicate: false };
     } catch (err) {
       lastError = err instanceof StorageError ? err : new StorageError("Unexpected storage failure", "transient");
@@ -150,4 +158,14 @@ export async function saveLead(
     }
   }
   throw lastError!;
+}
+
+/**
+ * Classify a sheet's first row: "match" (exact header), "none" (data starts in
+ * row 1), or "mismatch" (looks like a header but columns differ, which would
+ * silently mis-map every export column).
+ */
+export function headerRowStatus(firstRow: string[] | undefined): "match" | "none" | "mismatch" {
+  if (!firstRow || firstRow[0] !== SHEET_HEADERS[0]) return "none";
+  return SHEET_HEADERS.every((h, i) => firstRow[i] === h) ? "match" : "mismatch";
 }
