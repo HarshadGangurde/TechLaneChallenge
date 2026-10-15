@@ -184,7 +184,7 @@ export function ConsultationForm() {
           <legend className="mb-1.5 text-sm font-semibold">Preferred consultation format <span className="text-brand">*</span></legend>
           <div className="grid grid-cols-2 gap-3">
             {Object.entries(FORMAT_LABELS).map(([v, l], i) => (
-              <label key={v} className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border-2 px-4 py-3 has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-brand ${form.format === v ? "border-brand bg-brand/10" : "border-line bg-panel"}`}>
+              <label key={v} className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border-2 px-4 py-3 has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-brand ${form.format === v ? "border-brand bg-brand/10" : errors.format ? "border-danger bg-panel" : "border-line bg-panel"}`}>
                 <input id={i === 0 ? "format" : undefined} type="radio" name="format" value={v} checked={form.format === v} onChange={() => set("format", v)} className="accent-[#22d367]" />
                 {l}
               </label>

@@ -10,7 +10,7 @@ interface FieldProps {
 }
 
 export const inputClass =
-  "min-h-12 w-full rounded-xl border-2 border-line bg-panel px-4 py-3 text-base text-white placeholder:text-muted/70 focus:border-brand";
+  "min-h-12 w-full rounded-xl border-2 border-line bg-panel px-4 py-3 text-base text-white placeholder:text-muted/70 focus:border-brand aria-invalid:border-danger";
 
 export function Field({ id, label, required, hint, error, children }: FieldProps) {
   const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
