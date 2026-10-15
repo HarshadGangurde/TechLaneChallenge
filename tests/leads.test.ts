@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { StorageError, type SheetsGateway } from "@/lib/google-sheets";
+import { StorageError, type SheetCell, type SheetsGateway } from "@/lib/google-sheets";
 import {
   _resetRecentLeadsForTests,
   buildLeadRecord,
@@ -37,7 +37,7 @@ function payload(over: object = {}) {
 function fakeGateway(overrides: Partial<SheetsGateway> = {}) {
   const rows: string[][] = [];
   const gw: SheetsGateway = {
-    appendRow: vi.fn(async (v: string[]) => void rows.push(v)),
+    appendRow: vi.fn(async (v: SheetCell[]) => void rows.push(v.map(String))),
     readRows: vi.fn(async () => [[...SHEET_HEADERS], ...rows]),
     ...overrides,
   };
@@ -54,15 +54,17 @@ describe("lead record mapping", () => {
     expect(row).toHaveLength(SHEET_HEADERS.length);
     const byHeader = Object.fromEntries(SHEET_HEADERS.map((h, i) => [h, row[i]]));
     expect(byHeader["Lead ID"]).toMatch(/^L-[0-9A-F]{12}$/);
-    expect(byHeader["Created At"]).toBe("2026-10-25T10:00:00.000Z");
+    expect(byHeader["Created At"]).toBe("2026-10-25 15:30:00"); // India time
     expect(byHeader["Name"]).toBe("Asha Patil");
     expect(byHeader["Phone"]).toBe("+919876543210");
     expect(byHeader["Selected Track"]).toBe("Mobile App Development");
     expect(byHeader["Recommended Track"]).toBeTruthy();
-    expect(byHeader["Challenge Score"]).toMatch(/^\d+\/\d+$/);
+    expect(typeof byHeader["Challenge Score"]).toBe("number");
+    expect(byHeader["Challenge Score"]).toBeGreaterThan(0);
+    expect(byHeader["Challenge Score"]).toBeLessThanOrEqual(1);
     expect(byHeader["Consultation Format"]).toBe("Phone call");
-    expect(byHeader["Consultation Consent"]).toBe("Yes");
-    expect(byHeader["Marketing Consent"]).toBe("Yes");
+    expect(byHeader["Consultation Consent"]).toBe(true);
+    expect(byHeader["Marketing Consent"]).toBe(true);
     expect(byHeader["Lead Source"]).toBe("booth");
     expect(byHeader["Campaign"]).toBe("GDG_NASHIK_DEVFEST_2026");
     expect(byHeader["Lead Status"]).toBe("New");
@@ -106,7 +108,7 @@ describe("saveLead", () => {
   it("detects a lead already in the sheet (other instance) before appending", async () => {
     const { gw, rows } = fakeGateway();
     const rec = buildLeadRecord(payload());
-    rows.push(recordToRow(rec));
+    rows.push(recordToRow(rec).map(String));
     _resetRecentLeadsForTests();
     const res = await saveLead(gw, rec, { sleep: noSleep });
     expect(res.duplicate).toBe(true);
@@ -116,9 +118,9 @@ describe("saveLead", () => {
   it("retries transient failures and succeeds", async () => {
     const { gw, rows } = fakeGateway();
     let calls = 0;
-    gw.appendRow = vi.fn(async (v: string[]) => {
+    gw.appendRow = vi.fn(async (v: SheetCell[]) => {
       if (++calls < 3) throw new StorageError("boom", "transient", 503);
-      rows.push(v);
+      rows.push(v.map(String));
     });
     const res = await saveLead(gw, buildLeadRecord(payload()), { sleep: noSleep });
     expect(res.duplicate).toBe(false);
@@ -128,8 +130,8 @@ describe("saveLead", () => {
 
   it("does NOT re-append when a 'failed' attempt actually wrote the row", async () => {
     const { gw, rows } = fakeGateway();
-    gw.appendRow = vi.fn(async (v: string[]) => {
-      rows.push(v); // Google accepted the write...
+    gw.appendRow = vi.fn(async (v: SheetCell[]) => {
+      rows.push(v.map(String)); // Google accepted the write...
       throw new StorageError("timeout", "transient"); // ...but the response was lost
     });
     const res = await saveLead(gw, buildLeadRecord(payload()), { sleep: noSleep });

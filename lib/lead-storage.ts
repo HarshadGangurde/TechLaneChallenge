@@ -5,6 +5,7 @@ import { questionsForAnswers } from "@/lib/question-set";
 import { recommend } from "@/lib/scoring";
 import { getTrack } from "@/lib/tracks";
 import { STATUS_LABELS, FORMAT_LABELS } from "@/lib/constants";
+import type { SheetCell } from "@/lib/google-sheets";
 import { StorageError, type SheetsGateway } from "@/lib/google-sheets";
 import type { LeadPayload } from "@/lib/validation";
 
@@ -66,7 +67,7 @@ export function buildLeadRecord(p: LeadPayload, now: Date = new Date()): LeadRec
   }
   return {
     leadId: leadIdFromKey(p.idempotencyKey),
-    createdAt: now.toISOString(),
+    createdAt: formatSheetTimestamp(now),
     name: p.name,
     phone: p.phone,
     email: p.email,
@@ -86,11 +87,32 @@ export function buildLeadRecord(p: LeadPayload, now: Date = new Date()): LeadRec
   };
 }
 
-export function recordToRow(r: LeadRecord): string[] {
+/** "2026-10-25 15:30:00" in India time, matching how staff read the sheet. */
+export function formatSheetTimestamp(d: Date): string {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "short",
+    timeStyle: "medium",
+  }).format(d);
+}
+
+/** "60/80" -> 0.75, so the sheet can average it and show it as a percentage. Blank if there is no score. */
+function scoreFraction(score: string): number | "" {
+  const m = /^(\d+)\/(\d+)$/.exec(score);
+  if (!m || Number(m[2]) === 0) return "";
+  return Math.round((Number(m[1]) / Number(m[2])) * 10_000) / 10_000;
+}
+
+/**
+ * The row as written to the sheet. Consent flags are real booleans (they land
+ * in checkbox cells and can be counted) and the score is a number; everything
+ * else stays text, written RAW so nothing is parsed as a formula.
+ */
+export function recordToRow(r: LeadRecord): SheetCell[] {
   return [
     r.leadId, r.createdAt, r.name, r.phone, r.email, r.organisation, r.status,
-    r.recommendedTrack, r.selectedTrack, r.challengeScore, r.format, r.availability,
-    r.consent, r.marketingConsent, r.source, r.campaign, r.leadStatus, r.notes,
+    r.recommendedTrack, r.selectedTrack, scoreFraction(r.challengeScore), r.format, r.availability,
+    r.consent === "Yes", r.marketingConsent === "Yes", r.source, r.campaign, r.leadStatus, r.notes,
   ];
 }
 
