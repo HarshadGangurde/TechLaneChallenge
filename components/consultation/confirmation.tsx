@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ButtonLink } from "@/components/ui/button";
 import { session, useSubmittedLead } from "@/lib/session";
 
@@ -19,7 +20,10 @@ export function Confirmation() {
 
   return (
     <section className="animate-rise pt-10 text-center">
-      <div className="animate-pop mx-auto grid size-20 place-items-center rounded-full bg-brand text-4xl text-black" aria-hidden>✓</div>
+      <div className="animate-pop relative mx-auto grid size-32 place-items-center rounded-[2rem] border-2 border-brand bg-brand/10 shadow-[0_0_60px_-10px_rgb(34_211_103/0.5)]" aria-hidden>
+        <Image src="/logo.png" alt="" width={96} height={57} priority className="h-auto w-24" />
+        <span className="absolute -bottom-3 -right-3 grid size-9 place-items-center rounded-full border-4 border-ink bg-brand text-lg font-bold text-black">✓</span>
+      </div>
       <h1 className="mt-6 text-3xl font-extrabold leading-tight" role="status">Your consultation request has been submitted successfully!</h1>
       <p className="mx-auto mt-4 max-w-md text-[#cfe0d6]">
         The DeboisTech team will contact you using the details you provided to coordinate your free consultation.
