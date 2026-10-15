@@ -38,6 +38,7 @@ Test the QR attribution locally with `http://localhost:3000/?src=booth` (`src` /
    | --- | --- |
    | `GOOGLE_SHEETS_SPREADSHEET_ID` | The ID in the sheet URL: `/spreadsheets/d/<ID>/edit` |
    | `GOOGLE_SHEETS_SHEET_NAME` | Tab name, default `Leads` |
+   | `GOOGLE_SHEETS_TABLE_START` | Header row's first cell, default `A1`. Use e.g. `B8` when the table sits below a title/dashboard; the app reads and appends within that table only |
    | `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64` | **Preferred.** `base64 -w0 service-account.json` (macOS: `base64 -i file \| tr -d '\n'`) |
    | `GOOGLE_SERVICE_ACCOUNT_EMAIL` + `GOOGLE_PRIVATE_KEY` | Alternative to the JSON. Literal `\n` sequences and wrapping quotes in the key are handled |
    | `ADMIN_EXPORT_TOKEN` | Random secret, 24+ chars: `openssl rand -base64 32`. Export is disabled without it |

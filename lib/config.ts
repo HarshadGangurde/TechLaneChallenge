@@ -1,4 +1,5 @@
 import "server-only";
+import { tableRange } from "@/lib/sheet-range";
 
 export class ConfigError extends Error {
   constructor(message: string) {
@@ -10,6 +11,8 @@ export class ConfigError extends Error {
 export interface SheetsConfig {
   spreadsheetId: string;
   sheetName: string;
+  /** A1 range of the leads table from its header row down, e.g. "A1:R" or "B8:S". */
+  tableRange: string;
   clientEmail: string;
   privateKey: string;
 }
@@ -27,6 +30,13 @@ export function normalizePrivateKey(raw: string): string {
 export function getSheetsConfig(env: NodeJS.ProcessEnv = process.env): SheetsConfig {
   const spreadsheetId = env.GOOGLE_SHEETS_SPREADSHEET_ID?.trim();
   const sheetName = env.GOOGLE_SHEETS_SHEET_NAME?.trim() || "Leads";
+
+  let range: string;
+  try {
+    range = tableRange(env.GOOGLE_SHEETS_TABLE_START?.trim() || "A1");
+  } catch (err) {
+    throw new ConfigError(`GOOGLE_SHEETS_TABLE_START: ${err instanceof Error ? err.message : "invalid"}`);
+  }
 
   let clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
   let privateKey = env.GOOGLE_PRIVATE_KEY ? normalizePrivateKey(env.GOOGLE_PRIVATE_KEY) : undefined;
@@ -51,7 +61,7 @@ export function getSheetsConfig(env: NodeJS.ProcessEnv = process.env): SheetsCon
     throw new ConfigError("GOOGLE_PRIVATE_KEY is not a valid PEM private key.");
   }
 
-  return { spreadsheetId: spreadsheetId!, sheetName, clientEmail: clientEmail!, privateKey: privateKey! };
+  return { spreadsheetId: spreadsheetId!, sheetName, tableRange: range, clientEmail: clientEmail!, privateKey: privateKey! };
 }
 
 export function getAdminToken(env: NodeJS.ProcessEnv = process.env): string | null {
