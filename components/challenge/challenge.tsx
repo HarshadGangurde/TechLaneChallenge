@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { IntroScreen } from "@/components/challenge/intro";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
 import { isCorrect, recommend, scoreAnswers, XP_CORRECT, XP_PREFERENCE } from "@/lib/scoring";
@@ -9,10 +10,14 @@ import type { Question } from "@/types";
 
 export function Challenge() {
   const questions = useQuestionSet();
+  const raw = useAnswersRaw();
+  const [begun, setBegun] = useState(false);
   useEffect(() => {
     if (questions === null) session.ensureSeed();
   }, [questions]);
-  if (!questions) return <div className="mt-10 h-64 animate-pulse rounded-2xl bg-panel" aria-label="Loading challenge" />;
+  if (!questions || raw === undefined) return <div className="mt-10 h-64 animate-pulse rounded-2xl bg-panel" aria-label="Loading challenge" />;
+  // A fresh run starts with a short introduction; anyone resuming mid-challenge skips it.
+  if (!begun && Object.keys(parseAnswers(raw)).length === 0) return <IntroScreen total={questions.length} onStart={() => setBegun(true)} />;
   return <ChallengeRun questions={questions} />;
 }
 

@@ -51,7 +51,10 @@ function ChooseButton({ track, selected, onChoose, featured }: Pick<Props, "trac
 export function FeaturedTrackCard({ track, selected, onChoose, badge, featured, explanation }: Props) {
   return (
     <article className={`animate-rise rounded-2xl border-2 p-5 ${selected ? "border-brand bg-brand/10" : "border-line bg-panel"}`}>
-      {badge && <p className="font-mono text-xs uppercase tracking-widest text-brand">{badge}</p>}
+      <div className="flex items-center justify-between gap-2">
+        {badge ? <p className="font-mono text-xs uppercase tracking-widest text-brand">{badge}</p> : <span />}
+        {selected && <p className="rounded-full bg-brand px-2.5 py-0.5 font-mono text-xs font-bold text-black">✓ Your pick</p>}
+      </div>
       <h2 className="mt-1 text-2xl font-extrabold sm:text-3xl">
         <span aria-hidden className="mr-2">{track.emoji}</span>
         {track.name}

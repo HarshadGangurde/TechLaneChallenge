@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button, ButtonLink, Spinner } from "@/components/ui/button";
 import { Field, inputClass } from "@/components/ui/field";
+import { PillGroup } from "@/components/ui/pill-group";
 import { track } from "@/lib/analytics";
 import { AVAILABILITY_OPTIONS, FORMAT_LABELS, STATUS_LABELS } from "@/lib/constants";
 import { session, useSelectedTrack } from "@/lib/session";
@@ -28,7 +29,7 @@ const initial: FormState = {
   consent: false, marketingConsent: false, website: "",
 };
 
-const FIELD_ORDER = ["name", "phone", "email", "selectedTrack", "status", "organisation", "format", "availability", "consent"];
+const FIELD_ORDER = ["name", "phone", "email", "status", "organisation", "selectedTrack", "format", "availability", "consent"];
 const PRIVACY_CONTACT = process.env.NEXT_PUBLIC_PRIVACY_CONTACT;
 
 export function ConsultationForm() {
@@ -147,6 +148,8 @@ export function ConsultationForm() {
         )}
         <p className="text-xs text-muted"><span className="text-brand">*</span> required</p>
 
+        <h2 className="border-t border-line pt-5 font-mono text-xs uppercase tracking-widest text-brand">About you</h2>
+
         <Field id="name" label="Full name" required error={errors.name}>
           {(p) => <input {...p} className={inputClass} value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" maxLength={100} />}
         </Field>
@@ -159,6 +162,21 @@ export function ConsultationForm() {
           {(p) => <input {...p} className={inputClass} type="email" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" maxLength={254} />}
         </Field>
 
+        <PillGroup
+          name="status"
+          legend="Current status"
+          options={Object.entries(STATUS_LABELS)}
+          value={form.status}
+          onChange={(v) => set("status", v)}
+          error={errors.status}
+        />
+
+        <Field id="organisation" label="College or organisation" required error={errors.organisation}>
+          {(p) => <input {...p} className={inputClass} value={form.organisation} onChange={(e) => set("organisation", e.target.value)} autoComplete="organization" maxLength={150} />}
+        </Field>
+
+        <h2 className="border-t border-line pt-5 font-mono text-xs uppercase tracking-widest text-brand">Your consultation</h2>
+
         <Field id="selectedTrack" label="Technology track" required error={errors.selectedTrack} hint="Pre-filled with the track you chose. You can change it.">
           {(p) => (
             <select {...p} className={inputClass} value={selected} onChange={(e) => isTrackId(e.target.value) && (session.setSelectedTrack(e.target.value), track("track_selected", { track: e.target.value, source: session.getSource() }))}>
@@ -167,31 +185,14 @@ export function ConsultationForm() {
           )}
         </Field>
 
-        <Field id="status" label="Current status" required error={errors.status}>
-          {(p) => (
-            <select {...p} className={inputClass} value={form.status} onChange={(e) => set("status", e.target.value)}>
-              <option value="">Select…</option>
-              {Object.entries(STATUS_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
-          )}
-        </Field>
-
-        <Field id="organisation" label="College or organisation" required error={errors.organisation}>
-          {(p) => <input {...p} className={inputClass} value={form.organisation} onChange={(e) => set("organisation", e.target.value)} autoComplete="organization" maxLength={150} />}
-        </Field>
-
-        <fieldset aria-describedby={errors.format ? "format-error" : undefined}>
-          <legend className="mb-1.5 text-sm font-semibold">Preferred consultation format <span className="text-brand">*</span></legend>
-          <div className="grid grid-cols-2 gap-3">
-            {Object.entries(FORMAT_LABELS).map(([v, l], i) => (
-              <label key={v} className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border-2 px-4 py-3 has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-brand ${form.format === v ? "border-brand bg-brand/10" : errors.format ? "border-danger bg-panel" : "border-line bg-panel"}`}>
-                <input id={i === 0 ? "format" : undefined} type="radio" name="format" value={v} checked={form.format === v} onChange={() => set("format", v)} className="accent-[#22d367]" />
-                {l}
-              </label>
-            ))}
-          </div>
-          {errors.format && <p id="format-error" role="alert" className="mt-1 text-sm font-medium text-danger">{errors.format}</p>}
-        </fieldset>
+        <PillGroup
+          name="format"
+          legend="Preferred consultation format"
+          options={Object.entries(FORMAT_LABELS)}
+          value={form.format}
+          onChange={(v) => set("format", v)}
+          error={errors.format}
+        />
 
         <Field id="availability" label="Preferred contact availability" required error={errors.availability}>
           {(p) => (
@@ -201,6 +202,8 @@ export function ConsultationForm() {
             </select>
           )}
         </Field>
+
+        <h2 className="border-t border-line pt-5 font-mono text-xs uppercase tracking-widest text-brand">Consent</h2>
 
         <div className="space-y-3 rounded-2xl border border-line bg-panel p-4 text-sm">
           <p className="text-muted">

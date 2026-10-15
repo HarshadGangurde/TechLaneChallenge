@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { MatchChart } from "@/components/results/match-chart";
 import { CompactTrackCard, FeaturedTrackCard } from "@/components/results/track-card";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
@@ -62,6 +63,8 @@ export function Results() {
           <FeaturedTrackCard track={secondary} selected={selected === secondary.id} onChoose={choose} badge="Also a strong fit" />
         </div>
       )}
+
+      <MatchChart ranking={rec.ranking} scores={rec.scores} />
 
       <section aria-labelledby="others" className="mt-8">
         <h2 id="others" className="text-lg font-bold">Explore {secondary ? "other" : "the other"} tracks</h2>
