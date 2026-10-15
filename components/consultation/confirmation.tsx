@@ -26,12 +26,8 @@ export function Confirmation() {
       </div>
       <h1 className="mt-6 text-3xl font-extrabold leading-tight" role="status">Your consultation request has been submitted successfully!</h1>
       <p className="mx-auto mt-4 max-w-md text-[#3e3730]">
-        The DeboisTech team will contact you using the details you provided to coordinate your free consultation.
+        The DeboisTech team will contact you on the details you shared to confirm a time for your free consultation.
       </p>
-      <p className="mx-auto mt-3 max-w-md text-sm text-muted">
-        This is a request, not a confirmed appointment. The team will confirm a time with you separately. Meanwhile, keep exploring and building.
-      </p>
-      <p className="mt-5 font-mono text-xs text-muted">Reference: {leadId}</p>
       <div className="mt-8 flex flex-col items-center gap-3">
         <ButtonLink href="/" variant="secondary" onClick={() => { session.clearSubmitted(); session.resetChallenge(); }}>
           Done
