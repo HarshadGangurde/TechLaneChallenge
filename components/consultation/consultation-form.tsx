@@ -212,12 +212,12 @@ export function ConsultationForm() {
             {PRIVACY_CONTACT ? `To correct or delete your details, contact ${PRIVACY_CONTACT}.` : "To correct or delete your details, ask any DeboisTech team member."}
           </p>
           <label className="flex cursor-pointer items-start gap-3">
-            <input id="consent" type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={!!errors.consent} aria-describedby={errors.consent ? "consent-error" : undefined} className="mt-1 size-5 shrink-0 accent-[#3f9b50]" />
+            <input id="consent" type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={!!errors.consent} aria-describedby={errors.consent ? "consent-error" : undefined} className="mt-1 size-5 shrink-0 accent-[#2c8441]" />
             <span>I agree that DeboisTech may contact me about my consultation request. <span className="text-brand-strong">*</span></span>
           </label>
           {errors.consent && <p id="consent-error" role="alert" className="font-medium text-danger">{errors.consent}</p>}
           <label className="flex cursor-pointer items-start gap-3">
-            <input id="marketingConsent" type="checkbox" checked={form.marketingConsent} onChange={(e) => set("marketingConsent", e.target.checked)} className="mt-1 size-5 shrink-0 accent-[#3f9b50]" />
+            <input id="marketingConsent" type="checkbox" checked={form.marketingConsent} onChange={(e) => set("marketingConsent", e.target.checked)} className="mt-1 size-5 shrink-0 accent-[#2c8441]" />
             <span>Also keep me updated about DeboisTech workshops and programs. <span className="text-muted">(optional)</span></span>
           </label>
         </div>

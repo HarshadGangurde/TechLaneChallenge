@@ -9,7 +9,7 @@
   --color-line: #14110f;
   --color-muted: #6e6559;
   --color-danger: #c0281f;
-  --color-brand: #3f9b50; /* logo green: fills and borders */
+  --color-brand: #2c8441; /* logo green, deepened so white text passes AA on it */
   --color-brand-strong: #1f6f35; /* same hue, dark enough for text on cream */
   --color-lane-blue: #e6edfb;
   --color-lane-green: #e4f3e8;

@@ -53,7 +53,7 @@ export function FeaturedTrackCard({ track, selected, onChoose, badge, featured, 
     <article className={`animate-rise nb-card p-5 ${selected ? "bg-lane-green!" : ""}`}>
       <div className="flex items-center justify-between gap-2">
         {badge ? <p className="font-mono text-xs uppercase tracking-widest text-brand-strong">{badge}</p> : <span />}
-        {selected && <p className="rounded-full border-2 border-ink bg-brand px-2.5 py-0.5 font-mono text-xs font-bold text-ink">✓ Your pick</p>}
+        {selected && <p className="rounded-full border-2 border-ink bg-brand px-2.5 py-0.5 font-mono text-xs font-bold text-white">✓ Your pick</p>}
       </div>
       <h2 className="mt-1 font-display text-2xl font-extrabold sm:text-3xl">
         <span aria-hidden className="mr-2">{track.emoji}</span>

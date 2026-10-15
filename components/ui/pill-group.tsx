@@ -30,7 +30,7 @@ export function PillGroup({ name, legend, options, value, onChange, error, colum
               value={v}
               checked={value === v}
               onChange={() => onChange(v)}
-              className="accent-[#3f9b50]"
+              className="accent-[#2c8441]"
             />
             {label}
           </label>

@@ -26,10 +26,10 @@ export default function Home() {
       <LandingTracker />
       <section className="animate-rise relative pt-6 sm:pt-12">
         <PixelDoodle className="animate-bob pointer-events-none absolute -top-2 right-0 w-20 sm:w-32" />
-        <p className="pr-24 font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted">Find your lane · no sign-up</p>
+        <p className="pr-24 font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted">Find your tech lane</p>
         <h1 className="mt-4 font-display text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-8xl">
           YOUR TECH.
-          <span className="nb-shadow mt-2 inline-block -rotate-1 rounded-2xl border-2 border-ink bg-brand px-3 pb-1">
+          <span className="nb-shadow mt-2 inline-block -rotate-1 rounded-2xl border-2 border-ink bg-brand px-3 pb-1 text-white">
             YOUR PATH.
           </span>
         </h1>
@@ -68,7 +68,7 @@ export default function Home() {
               key={s.n}
               className={`relative pb-6 pl-16 ${i < steps.length - 1 ? "before:absolute before:left-6 before:top-12 before:bottom-0 before:border-l-2 before:border-dashed before:border-ink/40" : ""}`}
             >
-              <span aria-hidden className="nb-shadow-sm absolute left-0 top-0 grid size-12 place-items-center rounded-full border-2 border-ink bg-brand font-display text-xl font-extrabold">
+              <span aria-hidden className="nb-shadow-sm absolute left-0 top-0 grid size-12 place-items-center rounded-full border-2 border-ink bg-brand text-white font-display text-xl font-extrabold">
                 {s.n}
               </span>
               <div className="nb-card p-4">
@@ -93,9 +93,9 @@ export default function Home() {
         </ul>
       </section>
 
-      <section className="nb-card mt-12 flex flex-col items-start gap-4 bg-brand p-6">
+      <section className="nb-card mt-12 flex flex-col items-start gap-4 bg-brand p-6 text-white">
         <h2 className="font-display text-3xl font-extrabold leading-tight">Ready to find your lane?</h2>
-        <p className="font-medium text-ink">It takes about three minutes. Your result is yours, no contact details needed.</p>
+        <p className="font-medium text-white">It takes about three minutes. Your result is yours, no contact details needed.</p>
         <ButtonLink href="/challenge" variant="secondary" className="text-lg">
           Start Challenge →
         </ButtonLink>

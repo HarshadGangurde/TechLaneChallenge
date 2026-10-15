@@ -95,7 +95,7 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
         <span aria-live="polite" className="nb-shadow-sm rounded-full border-2 border-ink bg-white px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider">
           Question {current + 1} of {TOTAL}
         </span>
-        <span className="nb-shadow-sm relative rounded-full border-2 border-ink bg-brand px-3 py-1 font-mono text-sm font-bold" aria-label={`${xp} XP earned`}>
+        <span className="nb-shadow-sm relative rounded-full border-2 border-ink bg-brand px-3 py-1 font-mono text-sm font-bold text-white" aria-label={`${xp} XP earned`}>
           {xp} XP
           {chosen && gain > 0 && (
             <span key={question.id} aria-hidden className="animate-float-xp absolute -top-2 right-2 text-xs font-extrabold">+{gain}</span>
@@ -130,7 +130,7 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
           {question.prompt}
         </h1>
         {question.snippet && (
-          <pre className="mt-4 overflow-x-auto rounded-xl border-2 border-ink bg-ink p-4 font-mono text-sm leading-relaxed text-paper shadow-[3px_3px_0_0_#3f9b50]"><code>{question.snippet}</code></pre>
+          <pre className="mt-4 overflow-x-auto rounded-xl border-2 border-ink bg-ink p-4 font-mono text-sm leading-relaxed text-paper shadow-[3px_3px_0_0_#2c8441]"><code>{question.snippet}</code></pre>
         )}
 
         <div role="group" aria-label="Answer options" className="mt-5 grid gap-3">
