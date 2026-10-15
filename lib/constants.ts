@@ -1,0 +1,24 @@
+export const DEFAULT_CAMPAIGN = "GDG_NASHIK_DEVFEST_2026";
+export const DEFAULT_SOURCE = "direct";
+
+export const AVAILABILITY_OPTIONS = [
+  "Weekday mornings (9am-12pm)",
+  "Weekday afternoons (12pm-4pm)",
+  "Weekday evenings (4pm-8pm)",
+  "Weekends",
+  "Any time",
+] as const;
+
+export const STATUS_LABELS = {
+  college_student: "College student",
+  graduate: "Graduate",
+  working_professional: "Working professional",
+  other: "Other",
+} as const;
+
+export const FORMAT_LABELS = {
+  online: "Online",
+  phone_call: "Phone call",
+} as const;
+
+export const LEAD_STATUSES = ["New", "Contacted", "Scheduled", "Completed", "Closed"] as const;
