@@ -8,7 +8,7 @@ const valid = {
   organisation: "KK Wagh College",
   status: "college_student",
   selectedTrack: "mobile",
-  format: "online",
+  format: "office_visit",
   availability: "Weekends",
   consent: true,
   marketingConsent: false,
