@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { QUESTIONS } from "@/lib/questions";
-import { PREFERENCE_PER_RUN, primaryTrack, QUESTIONS_PER_RUN, questionsForAnswers, selectQuestions } from "@/lib/question-set";
+import { optionTrack, PREFERENCE_OPTIONS, PREFERENCE_PER_RUN, primaryTrack, QUESTIONS_PER_RUN, questionsForAnswers, selectQuestions } from "@/lib/question-set";
 import { recommend } from "@/lib/scoring";
-import { TRACK_IDS, type Answers, type Question, type TrackId } from "@/types";
+import { TRACK_IDS, type Answers } from "@/types";
 
 const seeds = Array.from({ length: 200 }, (_, i) => `seed-${i}`);
 
@@ -52,7 +52,10 @@ describe("selectQuestions", () => {
     const run = selectQuestions("opts");
     for (const q of run) {
       const original = QUESTIONS.find((b) => b.id === q.id)!;
-      expect([...q.options].sort((a, b) => a.id.localeCompare(b.id))).toEqual([...original.options].sort((a, b) => a.id.localeCompare(b.id)));
+      // Every shown option is an untouched original; knowledge questions keep all of theirs.
+      for (const o of q.options) expect(original.options).toContainEqual(o);
+      expect(q.options.length).toBe(q.kind === "knowledge" ? original.options.length : PREFERENCE_OPTIONS);
+      expect(new Set(q.options.map((o) => o.id)).size).toBe(q.options.length);
       expect(q.correctOptionId).toBe(original.correctOptionId);
     }
     const orders = new Set(seeds.map((s) => selectQuestions(s).flatMap((q) => q.options.map((o) => o.id)).join("")));
@@ -65,34 +68,49 @@ describe("selectQuestions", () => {
   });
 });
 
-function answer(run: Question[], track: TrackId, knowledge: "correct" | "wrong"): Answers {
-  const a: Answers = {};
-  for (const q of run) {
-    if (q.kind === "knowledge") {
-      a[q.id] = knowledge === "correct" ? q.correctOptionId! : q.options.find((o) => o.id !== q.correctOptionId)!.id;
-    } else {
-      a[q.id] = q.options.reduce((best, o) => ((o.scores?.[track] ?? 0) > (best.scores?.[track] ?? 0) ? o : best)).id;
+describe("preference questions show four options without sidelining any track", () => {
+  it("has one option per track in every bank preference question", () => {
+    for (const q of QUESTIONS.filter((x) => x.kind === "preference")) {
+      expect(q.options.length, q.id).toBe(TRACK_IDS.length);
+      expect(new Set(q.options.map(optionTrack)).size, q.id).toBe(TRACK_IDS.length);
     }
-  }
-  return a;
-}
-
-describe("every random run can recommend every track", () => {
-  for (const track of TRACK_IDS) {
-    it(`recommends ${track} for answers favouring it (all seeds)`, () => {
+  });
+  it("shows exactly four options per preference question in every run", () => {
+    for (const seed of seeds) {
+      for (const q of selectQuestions(seed).filter((x) => x.kind === "preference")) {
+        expect(q.options, `${seed} ${q.id}`).toHaveLength(PREFERENCE_OPTIONS);
+      }
+    }
+  });
+  it("keeps every track on offer in at least two of the four preference questions", () => {
+    for (const seed of seeds) {
+      const prefs = selectQuestions(seed).filter((x) => x.kind === "preference");
+      for (const t of TRACK_IDS) {
+        const shown = prefs.filter((q) => q.options.some((o) => optionTrack(o) === t)).length;
+        expect(shown, `${seed} ${t}`).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
+  it("still lets a student who picks a track whenever it is offered reach that track's top score", () => {
+    for (const track of TRACK_IDS) {
       for (const seed of seeds) {
         const run = selectQuestions(seed);
-        expect(recommend(answer(run, track, "wrong"), run).primary, seed).toBe(track);
-        expect(recommend(answer(run, track, "correct"), run).primary, seed).toBe(track);
+        const a: Answers = {};
+        for (const q of run) {
+          if (q.kind === "knowledge") a[q.id] = q.options.find((o) => o.id !== q.correctOptionId)!.id;
+          else a[q.id] = (q.options.find((o) => optionTrack(o) === track) ?? q.options[0]).id;
+        }
+        const rec = recommend(a, run);
+        expect(rec.scores[track], `${seed} ${track}`).toBeGreaterThanOrEqual(2 * 2); // offered in >=2 questions, >=2 points each
       }
-    });
-  }
+    }
+  });
 });
 
 describe("questionsForAnswers", () => {
   it("returns only the answered bank questions, so a run's max XP is computed on that run", () => {
     const run = selectQuestions("srv");
-    const a = answer(run, "mobile", "correct");
+    const a: Answers = Object.fromEntries(run.map((q) => [q.id, q.options[0].id]));
     expect(questionsForAnswers({ ...a, "fake-id": "a" }).map((q) => q.id).sort()).toEqual(run.map((q) => q.id).sort());
     expect(recommend(a, questionsForAnswers(a)).score.maxXp).toBe(recommend(a, run).score.maxXp);
   });

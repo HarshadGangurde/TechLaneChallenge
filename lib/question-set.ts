@@ -1,10 +1,12 @@
 import { QUESTIONS } from "@/lib/questions";
-import { TRACK_IDS, type Answers, type Question, type TrackId } from "@/types";
+import { TRACK_IDS, type AnswerOption, type Answers, type Question, type TrackId } from "@/types";
 
 /** Questions each student answers per run, drawn from the larger bank. */
 export const QUESTIONS_PER_RUN = 10;
 /** How many of those are "what excites you" preference questions; the rest are knowledge questions. */
 export const PREFERENCE_PER_RUN = 4;
+/** Options shown on each preference question (the bank has one per track, so some tracks sit out each time). */
+export const PREFERENCE_OPTIONS = 4;
 
 /** Deterministic PRNG so one seed always yields the same questions and option order. */
 function createRng(seed: string): () => number {
@@ -38,6 +40,20 @@ export function primaryTrack(question: Question): TrackId | null {
   let bestPts = 0;
   for (const id of TRACK_IDS) {
     const pts = question.tracksOnCorrect?.[id] ?? 0;
+    if (pts > bestPts) {
+      best = id;
+      bestPts = pts;
+    }
+  }
+  return best;
+}
+
+/** The track an option mainly points to (highest points; ties go to catalogue order). */
+export function optionTrack(option: AnswerOption): TrackId | null {
+  let best: TrackId | null = null;
+  let bestPts = 0;
+  for (const id of TRACK_IDS) {
+    const pts = option.scores?.[id] ?? 0;
     if (pts > bestPts) {
       best = id;
       bestPts = pts;
@@ -80,7 +96,31 @@ export function selectQuestions(
 
   const [warmUp, ...restPref] = preference.slice(0, prefCount);
   const rest = shuffle([...restPref, ...picked], rng);
-  return [...(warmUp ? [warmUp] : []), ...rest].map((q) => ({ ...q, options: shuffle(q.options, rng) }));
+  const ordered = [...(warmUp ? [warmUp] : []), ...rest];
+
+  // Each preference question hides the options of a few tracks. Hidden tracks come from
+  // successive shuffles of the track list, so over 4 questions no track is hidden more than
+  // twice and every track stays reachable through at least two preference questions.
+  let hidden: TrackId[] = [];
+  const nextHidden = (n: number): TrackId[] => {
+    while (hidden.length < n) hidden = [...hidden, ...shuffle([...TRACK_IDS], rng)];
+    const out = hidden.slice(0, n);
+    hidden = hidden.slice(n);
+    return out;
+  };
+
+  return ordered.map((q) => {
+    let options = q.options;
+    if (q.kind === "preference" && options.length > PREFERENCE_OPTIONS) {
+      const gone = nextHidden(options.length - PREFERENCE_OPTIONS);
+      const kept = options.filter((o) => {
+        const t = optionTrack(o);
+        return !t || !gone.includes(t);
+      });
+      if (kept.length >= 2) options = kept;
+    }
+    return { ...q, options: shuffle(options, rng) };
+  });
 }
 
 /** The questions a set of answers refers to (server side: the client only ever answers its own run). */
