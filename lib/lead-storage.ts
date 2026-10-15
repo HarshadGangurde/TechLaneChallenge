@@ -1,6 +1,7 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import { DEFAULT_CAMPAIGN } from "@/lib/constants";
+import { questionsForAnswers } from "@/lib/question-set";
 import { recommend } from "@/lib/scoring";
 import { getTrack } from "@/lib/tracks";
 import { STATUS_LABELS, FORMAT_LABELS } from "@/lib/constants";
@@ -59,7 +60,7 @@ export function buildLeadRecord(p: LeadPayload, now: Date = new Date()): LeadRec
   let recommendedTrack = "";
   let challengeScore = "";
   if (p.answers && Object.keys(p.answers).length > 0) {
-    const r = recommend(p.answers);
+    const r = recommend(p.answers, questionsForAnswers(p.answers));
     recommendedTrack = getTrack(r.primary).name;
     challengeScore = `${r.score.xp}/${r.score.maxXp}`;
   }

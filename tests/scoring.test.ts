@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { QUESTIONS } from "@/lib/questions";
+import { QUESTIONS as BANK } from "@/lib/questions";
+import { QUESTIONS_PER_RUN } from "@/lib/question-set";
 import { CLOSE_MARGIN, maxXp, rankTracks, recommend, scoreAnswer, scoreAnswers, XP_CORRECT, XP_PREFERENCE } from "@/lib/scoring";
 import { TRACK_IDS, type Answers, type TrackId } from "@/types";
+
+/** The original ten-question run: these tests exercise scoring maths on a fixed set. */
+const QUESTIONS = BANK.filter((x) => /^q([1-9]|10)-/.test(x.id));
 
 const q = (id: string) => QUESTIONS.find((x) => x.id === id)!;
 
@@ -26,13 +30,13 @@ function prefOptionFor(track: TrackId) {
 }
 
 describe("question bank integrity", () => {
-  it("has 8-12 questions with unique ids", () => {
-    expect(QUESTIONS.length).toBeGreaterThanOrEqual(8);
-    expect(QUESTIONS.length).toBeLessThanOrEqual(12);
-    expect(new Set(QUESTIONS.map((x) => x.id)).size).toBe(QUESTIONS.length);
+  it("has a bank larger than one run, with unique ids", () => {
+    expect(QUESTIONS.length).toBe(10);
+    expect(BANK.length).toBeGreaterThan(QUESTIONS_PER_RUN);
+    expect(new Set(BANK.map((x) => x.id)).size).toBe(BANK.length);
   });
   it("defines a scoring mapping for every question", () => {
-    for (const question of QUESTIONS) {
+    for (const question of BANK) {
       expect(new Set(question.options.map((o) => o.id)).size).toBe(question.options.length);
       if (question.kind === "knowledge") {
         expect(question.options.some((o) => o.id === question.correctOptionId)).toBe(true);
@@ -43,7 +47,7 @@ describe("question bank integrity", () => {
     }
   });
   it("only references valid track ids", () => {
-    for (const question of QUESTIONS) {
+    for (const question of BANK) {
       const refs = [question.tracksOnCorrect, ...question.options.map((o) => o.scores)];
       for (const r of refs) for (const k of Object.keys(r ?? {})) expect(TRACK_IDS).toContain(k);
     }
@@ -77,26 +81,26 @@ describe("interest-based scoring (preference)", () => {
 describe("scoreAnswers safety", () => {
   it("cannot double count: same input always gives the same score", () => {
     const a = answersFor(prefOptionFor("genai"));
-    expect(scoreAnswers(a)).toEqual(scoreAnswers({ ...a }));
+    expect(scoreAnswers(a, QUESTIONS)).toEqual(scoreAnswers({ ...a }, QUESTIONS));
   });
   it("ignores unknown question ids", () => {
     const a = answersFor(prefOptionFor("genai"));
-    expect(scoreAnswers({ ...a, "fake-question": "a" }).xp).toBe(scoreAnswers(a).xp);
+    expect(scoreAnswers({ ...a, "fake-question": "a" }, QUESTIONS).xp).toBe(scoreAnswers(a, QUESTIONS).xp);
   });
   it("max XP is reached by answering everything correctly", () => {
-    expect(scoreAnswers(answersFor(prefOptionFor("ai-ml"))).xp).toBe(maxXp());
+    expect(scoreAnswers(answersFor(prefOptionFor("ai-ml")), QUESTIONS).xp).toBe(maxXp(QUESTIONS));
   });
 });
 
 describe("recommendation for each of the six tracks", () => {
   for (const track of TRACK_IDS) {
     it(`recommends ${track} for answers favouring it`, () => {
-      const rec = recommend(answersFor(prefOptionFor(track)));
+      const rec = recommend(answersFor(prefOptionFor(track)), QUESTIONS);
       expect(rec.primary).toBe(track);
       expect(rec.reasons.length).toBeGreaterThan(0);
     });
     it(`recommends ${track} even when every knowledge answer is wrong`, () => {
-      expect(recommend(answersFor(prefOptionFor(track), "wrong")).primary).toBe(track);
+      expect(recommend(answersFor(prefOptionFor(track), "wrong"), QUESTIONS).primary).toBe(track);
     });
   }
 });
@@ -111,20 +115,20 @@ describe("ties and close results", () => {
   it("offers a secondary track when scores are within the margin", () => {
     // Mostly mobile preferences, but knowledge answers lean AI/ML: a close race.
     const a = answersFor(prefOptionFor("mobile"));
-    const rec = recommend(a);
+    const rec = recommend(a, QUESTIONS);
     const gap = rec.scores[rec.ranking[0]] - rec.scores[rec.ranking[1]];
     expect(rec.secondary === null).toBe(gap > CLOSE_MARGIN || rec.scores[rec.ranking[1]] === 0);
   });
   it("shows a secondary track for a constructed close result", () => {
     // AI/ML: q1 a (3) + q4 b (3) = 6. FDE: q9 c (3) + q10 c (3) = 6. A dead heat.
     const a = { ...answersFor(() => "a", "wrong"), "q1-build": "a", "q4-process": "b", "q9-satisfying": "c", "q10-style": "c" };
-    const rec = recommend(a);
+    const rec = recommend(a, QUESTIONS);
     expect(rec.scores["ai-ml"]).toBe(rec.scores.fde);
     expect(rec.primary).toBe("ai-ml"); // tie broken by catalogue order
     expect(rec.secondary).toBe("fde");
   });
   it("gives no secondary when the leader is far ahead", () => {
-    const rec = recommend(answersFor(prefOptionFor("cloud-devops")));
+    const rec = recommend(answersFor(prefOptionFor("cloud-devops")), QUESTIONS);
     expect(rec.secondary === null || rec.scores[rec.secondary] >= rec.scores[rec.primary] - CLOSE_MARGIN).toBe(true);
   });
 });
@@ -132,11 +136,11 @@ describe("ties and close results", () => {
 describe("manual selection overrides recommendation", () => {
   it("does not change the computed recommendation when another track is chosen", () => {
     const a = answersFor(prefOptionFor("agentic-ai"));
-    const rec = recommend(a);
+    const rec = recommend(a, QUESTIONS);
     const chosen: TrackId = "mobile";
     expect(rec.primary).toBe("agentic-ai");
     // Selected track is independent state; the lead stores both.
     expect(chosen).not.toBe(rec.primary);
-    expect(recommend(a).primary).toBe(rec.primary);
+    expect(recommend(a, QUESTIONS).primary).toBe(rec.primary);
   });
 });

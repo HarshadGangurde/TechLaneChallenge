@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { QUESTIONS_PER_RUN } from "@/lib/question-set";
 import { isTrackId } from "@/lib/tracks";
 import { AVAILABILITY_OPTIONS, DEFAULT_CAMPAIGN, DEFAULT_SOURCE } from "@/lib/constants";
 import { CONSULTATION_FORMATS, CURRENT_STATUSES, TRACK_IDS } from "@/types";
@@ -51,7 +52,7 @@ export const leadPayloadSchema = z.object({
     }),
   email: z.preprocess(
     (v) => (typeof v === "string" && v.trim() === "" ? undefined : cleanText(v)),
-    z.string().max(254, "Email is too long.").email("Enter a valid email address.").optional(),
+    z.string().max(254, "Email is too long.").pipe(z.email("Enter a valid email address.")).optional(),
   ),
   organisation: text("College or organisation", 2, 150),
   status: z.enum(CURRENT_STATUSES, { error: "Select your current status." }),
@@ -64,14 +65,14 @@ export const leadPayloadSchema = z.object({
   consent: z.literal(true, { error: "Please agree to be contacted about your consultation." }),
   marketingConsent: z.boolean().default(false),
   /** Raw challenge answers; the server recomputes recommendation and score itself. */
-  answers: z.record(z.string().max(40), z.string().max(40)).refine((o) => Object.keys(o).length <= 30).optional(),
+  answers: z.record(z.string().max(40), z.string().max(40)).refine((o) => Object.keys(o).length <= QUESTIONS_PER_RUN).optional(),
   source: z.string().regex(slug).optional().catch(undefined),
   campaign: z.string().regex(slug).optional().catch(undefined),
   idempotencyKey: z
     .string({ error: "Missing submission key." })
     .regex(/^[A-Za-z0-9_-]{16,64}$/, "Invalid submission key."),
-  /** Honeypot: real users never fill this in. */
-  website: z.string().max(0).optional(),
+  /** Honeypot: real users never fill this in. The route (not the schema) decides what to do with a filled value. */
+  website: z.string().max(200).optional(),
 });
 
 export type LeadPayload = z.infer<typeof leadPayloadSchema>;

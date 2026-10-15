@@ -95,8 +95,10 @@ describe("parseLeadPayload", () => {
     expect(ok.ok && ok.data.source).toBe("booth");
   });
 
-  it("requires an idempotency key and an empty honeypot", () => {
+  it("requires an idempotency key and lets the route handle a filled honeypot", () => {
     expect(parseLeadPayload({ ...valid, idempotencyKey: "short" }).ok).toBe(false);
-    expect(parseLeadPayload({ ...valid, website: "http://spam" }).ok).toBe(false);
+    const r = parseLeadPayload({ ...valid, website: "http://spam" });
+    expect(r.ok && r.data.website).toBe("http://spam");
+    expect(parseLeadPayload({ ...valid, website: "x".repeat(201) }).ok).toBe(false);
   });
 });

@@ -5,9 +5,8 @@ import { CompactTrackCard, FeaturedTrackCard } from "@/components/results/track-
 import { Button, ButtonLink } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
 import { explainRecommendation } from "@/lib/explain";
-import { QUESTIONS } from "@/lib/questions";
 import { recommend } from "@/lib/scoring";
-import { parseAnswers, session, useAnswersRaw, useSelectedTrack } from "@/lib/session";
+import { parseAnswers, session, useAnswersRaw, useQuestionSet, useSelectedTrack } from "@/lib/session";
 import { getTrack, TRACK_LIST } from "@/lib/tracks";
 import type { TrackId } from "@/types";
 
@@ -15,10 +14,11 @@ export function Results() {
   const raw = useAnswersRaw();
   const selected = useSelectedTrack();
   const answers = useMemo(() => parseAnswers(raw), [raw]);
-  const complete = QUESTIONS.every((q) => answers[q.id]);
-  const rec = useMemo(() => (complete ? recommend(answers) : null), [complete, answers]);
+  const questions = useQuestionSet();
+  const complete = !!questions?.length && questions.every((q) => answers[q.id]);
+  const rec = useMemo(() => (complete && questions ? recommend(answers, questions) : null), [complete, answers, questions]);
 
-  if (raw === undefined || selected === undefined) {
+  if (raw === undefined || selected === undefined || questions === undefined) {
     return <div className="mt-10 h-64 animate-pulse rounded-2xl bg-panel" aria-label="Loading results" />;
   }
 
@@ -53,7 +53,7 @@ export function Results() {
           onChoose={choose}
           badge="★ Best match"
           featured
-          explanation={explainRecommendation(rec)}
+          explanation={explainRecommendation(rec, questions ?? [])}
         />
       </div>
 

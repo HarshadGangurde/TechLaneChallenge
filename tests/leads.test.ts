@@ -8,10 +8,10 @@ import {
   SHEET_HEADERS,
   saveLead,
 } from "@/lib/lead-storage";
-import { QUESTIONS } from "@/lib/questions";
+import { selectQuestions } from "@/lib/question-set";
 import { parseLeadPayload } from "@/lib/validation";
 
-const answers = Object.fromEntries(QUESTIONS.map((q) => [q.id, q.kind === "knowledge" ? q.correctOptionId! : q.options[0].id]));
+const answers = Object.fromEntries(selectQuestions("lead-test-seed").map((q) => [q.id, q.kind === "knowledge" ? q.correctOptionId! : q.options[0].id]));
 
 function payload(over: object = {}) {
   const r = parseLeadPayload({

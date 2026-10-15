@@ -3,13 +3,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
-import { QUESTIONS } from "@/lib/questions";
 import { isCorrect, recommend, scoreAnswers, XP_CORRECT, XP_PREFERENCE } from "@/lib/scoring";
-import { parseAnswers, session, useAnswersRaw } from "@/lib/session";
-
-const TOTAL = QUESTIONS.length;
+import { parseAnswers, session, useAnswersRaw, useQuestionSet } from "@/lib/session";
+import type { Question } from "@/types";
 
 export function Challenge() {
+  const questions = useQuestionSet();
+  useEffect(() => {
+    if (questions === null) session.ensureSeed();
+  }, [questions]);
+  if (!questions) return <div className="mt-10 h-64 animate-pulse rounded-2xl bg-panel" aria-label="Loading challenge" />;
+  return <ChallengeRun questions={questions} />;
+}
+
+function ChallengeRun({ questions }: { questions: Question[] }) {
+  const TOTAL = questions.length;
   const raw = useAnswersRaw();
   const answers = useMemo(() => parseAnswers(raw), [raw]);
   const [index, setIndex] = useState<number | null>(null);
@@ -19,12 +27,12 @@ export function Challenge() {
   const focusNext = useRef(false);
   const mounted = useRef(false);
 
-  const firstUnanswered = QUESTIONS.findIndex((q) => !answers[q.id]);
+  const firstUnanswered = questions.findIndex((q) => !answers[q.id]);
   // Resume where the student left off, then stay put: the index must not follow
   // "first unanswered" or the screen would jump ahead as soon as an answer saves.
   if (index === null && raw !== undefined) setIndex(firstUnanswered === -1 ? TOTAL : firstUnanswered);
   const current = index ?? 0;
-  const { xp, maxXp, correct, knowledgeTotal } = useMemo(() => scoreAnswers(answers), [answers]);
+  const { xp, maxXp, correct, knowledgeTotal } = useMemo(() => scoreAnswers(answers, questions), [answers, questions]);
 
   useEffect(() => {
     if (raw !== undefined && !startedRef.current && Object.keys(answers).length === 0) {
@@ -33,7 +41,7 @@ export function Challenge() {
     }
   }, [raw, answers]);
 
-  const question = QUESTIONS[current];
+  const question = questions[current];
   const chosen = question ? answers[question.id] : undefined;
 
   useEffect(() => {
@@ -61,7 +69,7 @@ export function Challenge() {
 
   function next() {
     if (current < TOTAL - 1) return setIndex(current + 1);
-    const rec = recommend(answers);
+    const rec = recommend(answers, questions);
     track("challenge_completed", { xp: rec.score.xp, source: session.getSource() });
     track("track_recommended", { recommended_track: rec.primary, source: session.getSource() });
     setIndex(TOTAL);
@@ -71,7 +79,7 @@ export function Challenge() {
     return <Completion xp={xp} maxXp={maxXp} correct={correct} knowledgeTotal={knowledgeTotal} onReview={() => setIndex(TOTAL - 1)} />;
   }
 
-  const answeredCount = QUESTIONS.filter((q) => answers[q.id]).length;
+  const answeredCount = questions.filter((q) => answers[q.id]).length;
   const wasCorrect = chosen ? isCorrect(question, chosen) : false;
   const gain = chosen ? (question.kind === "knowledge" ? (wasCorrect ? XP_CORRECT : 0) : XP_PREFERENCE) : 0;
 
@@ -107,7 +115,7 @@ export function Challenge() {
         )}
 
         <div role="group" aria-label="Answer options" className="mt-5 grid gap-3">
-          {question.options.map((o) => {
+          {question.options.map((o, i) => {
             const selected = chosen === o.id;
             const reveal = !!chosen && question.kind === "knowledge";
             const isRight = reveal && o.id === question.correctOptionId;
@@ -129,7 +137,7 @@ export function Challenge() {
                 className={`flex min-h-14 w-full items-start gap-3 rounded-xl border-2 px-4 py-3 text-left text-base transition ${tone} ${chosen && !selected && !isRight ? "opacity-60" : ""}`}
               >
                 <span aria-hidden className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md border border-current font-mono text-xs uppercase">
-                  {isRight ? "✓" : isWrong ? "✗" : o.id}
+                  {isRight ? "✓" : isWrong ? "✗" : String.fromCharCode(97 + i)}
                 </span>
                 <span>
                   {o.label}
