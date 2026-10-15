@@ -33,6 +33,8 @@ export interface AnswerOption {
 export interface Question {
   id: string;
   kind: QuestionKind;
+  /** Optional emoji shown beside the category tag. */
+  emoji?: string;
   /** Short label such as "Scenario" or "Debugging". */
   category: string;
   prompt: string;

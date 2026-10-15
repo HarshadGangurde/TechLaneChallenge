@@ -125,7 +125,7 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
       </div>
 
       <div key={question.id} className="animate-rise mt-6">
-        <p className="inline-block rounded-full border-2 border-ink bg-lane-sun px-3 py-0.5 font-mono text-xs font-bold uppercase tracking-widest">{question.category}</p>
+        <p className="inline-block rounded-full border-2 border-ink bg-lane-sun px-3 py-0.5 font-mono text-xs font-bold uppercase tracking-widest">{question.emoji && <span aria-hidden>{question.emoji} </span>}{question.category}</p>
         <h1 id="q-heading" ref={headingRef} tabIndex={-1} className="mt-3 font-display text-2xl font-extrabold leading-snug outline-none sm:text-3xl">
           {question.prompt}
         </h1>
