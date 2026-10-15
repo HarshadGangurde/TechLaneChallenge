@@ -154,7 +154,7 @@ export function ConsultationForm() {
           {(p) => <input {...p} className={inputClass} type="tel" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" placeholder="+91 " maxLength={24} />}
         </Field>
 
-        <Field id="email" label="Email" error={errors.email} hint="Only if you would like follow-ups by email.">
+        <Field id="email" label="Email" required error={errors.email} hint="We will send your consultation details here.">
           {(p) => <input {...p} className={inputClass} type="email" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" maxLength={254} />}
         </Field>
 

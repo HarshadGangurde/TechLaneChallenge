@@ -69,7 +69,7 @@ export function buildLeadRecord(p: LeadPayload, now: Date = new Date()): LeadRec
     createdAt: now.toISOString(),
     name: p.name,
     phone: p.phone,
-    email: p.email ?? "",
+    email: p.email,
     organisation: p.organisation,
     status: STATUS_LABELS[p.status],
     recommendedTrack,

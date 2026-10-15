@@ -51,8 +51,12 @@ export const leadPayloadSchema = z.object({
       return n;
     }),
   email: z.preprocess(
-    (v) => (typeof v === "string" && v.trim() === "" ? undefined : cleanText(v)),
-    z.string().max(254, "Email is too long.").pipe(z.email("Enter a valid email address.")).optional(),
+    cleanText,
+    z
+      .string({ error: "Email is required." })
+      .min(1, "Email is required.")
+      .max(254, "Email is too long.")
+      .pipe(z.email("Enter a valid email address.")),
   ),
   organisation: text("College or organisation", 2, 150),
   status: z.enum(CURRENT_STATUSES, { error: "Select your current status." }),

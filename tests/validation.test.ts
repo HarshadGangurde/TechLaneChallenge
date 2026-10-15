@@ -4,7 +4,7 @@ import { normalizePhone, parseLeadPayload } from "@/lib/validation";
 const valid = {
   name: "  Asha   Patil ",
   phone: "+91 98765 43210",
-  email: "",
+  email: "asha@example.com",
   organisation: "KK Wagh College",
   status: "college_student",
   selectedTrack: "mobile",
@@ -35,7 +35,7 @@ describe("parseLeadPayload", () => {
     if (r.ok) {
       expect(r.data.name).toBe("Asha Patil");
       expect(r.data.phone).toBe("+919876543210");
-      expect(r.data.email).toBeUndefined();
+      expect(r.data.email).toBe("asha@example.com");
       expect(r.data.campaign).toBe("GDG_NASHIK_DEVFEST_2026");
       expect(r.data.source).toBe("direct");
     }
@@ -45,7 +45,7 @@ describe("parseLeadPayload", () => {
     const r = parseLeadPayload({ idempotencyKey: valid.idempotencyKey });
     expect(r.ok).toBe(false);
     if (!r.ok) {
-      for (const f of ["name", "phone", "organisation", "status", "selectedTrack", "format", "availability", "consent"]) {
+      for (const f of ["name", "phone", "email", "organisation", "status", "selectedTrack", "format", "availability", "consent"]) {
         expect(r.errors[f]).toBeTruthy();
       }
     }
@@ -76,6 +76,13 @@ describe("parseLeadPayload", () => {
     expect(parseLeadPayload({ ...valid, availability: "whenever" }).ok).toBe(false);
   });
 
+  it("requires an email and rejects blank or whitespace-only values", () => {
+    for (const email of ["", "   ", undefined]) {
+      const r = parseLeadPayload({ ...valid, email });
+      expect(r.ok, String(email)).toBe(false);
+      if (!r.ok) expect(r.errors.email).toBe("Email is required.");
+    }
+  });
   it("accepts an email when supplied and keeps marketing consent separate", () => {
     const r = parseLeadPayload({ ...valid, email: "asha@example.com", marketingConsent: true });
     expect(r.ok && r.data.email).toBe("asha@example.com");
