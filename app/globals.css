@@ -1,39 +1,71 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #22d367;
-  --color-brand-strong: #16a34a;
-  --color-ink: #070b09;
-  --color-panel: #0e1511;
-  --color-panel-2: #141d18;
-  --color-line: #24332b;
-  --color-muted: #9db0a5;
-  --color-danger: #ff6b6b;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  /* DeboisTech "paper & ink" palette: warm cream, near-black outlines, logo green. */
+  --color-paper: #fbf7ef;
+  --color-ink: #14110f;
+  --color-panel: #ffffff;
+  --color-panel-2: #f3ecdd;
+  --color-line: #14110f;
+  --color-muted: #6e6559;
+  --color-danger: #c0281f;
+  --color-brand: #3f9b50; /* logo green: fills and borders */
+  --color-brand-strong: #1f6f35; /* same hue, dark enough for text on cream */
+  --color-lane-blue: #e6edfb;
+  --color-lane-green: #e4f3e8;
+  --color-lane-pink: #fbe7e4;
+  --color-lane-sand: #f3ead6;
+  --color-lane-lilac: #eee7fa;
+  --color-lane-sun: #fff0c2;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
-  background: var(--color-ink);
+  background: var(--color-paper);
 }
 
 body {
-  background:
-    radial-gradient(900px 420px at 80% -10%, rgb(34 211 103 / 0.12), transparent 60%),
-    var(--color-ink);
-  color: #e8f1ec;
+  background-color: var(--color-paper);
+  background-image: radial-gradient(rgb(20 17 15 / 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--color-ink);
   font-family: var(--font-sans);
   min-height: 100dvh;
   -webkit-tap-highlight-color: transparent;
 }
 
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
 :focus-visible {
-  outline: 3px solid var(--color-brand);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* Headings receive focus from script on screen changes; no ring needed there. */
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
+/* Chunky "sticker" look: thick ink outline with a hard offset shadow. */
+@utility nb-card {
+  border: 2px solid var(--color-ink);
+  border-radius: 1rem;
+  background: var(--color-panel);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+@utility nb-shadow {
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+@utility nb-shadow-sm {
+  box-shadow: 2px 2px 0 var(--color-ink);
 }
 
 @keyframes rise {
@@ -41,18 +73,23 @@ body {
   to { opacity: 1; transform: none; }
 }
 @keyframes pop {
-  0% { transform: scale(0.8); opacity: 0; }
-  60% { transform: scale(1.08); }
-  100% { transform: scale(1); opacity: 1; }
+  0% { transform: scale(0.8) rotate(-4deg); opacity: 0; }
+  60% { transform: scale(1.08) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 @keyframes float-xp {
   from { opacity: 1; transform: translateY(0); }
   to { opacity: 0; transform: translateY(-18px); }
 }
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
 
 .animate-rise { animation: rise 0.35s ease-out both; }
 .animate-pop { animation: pop 0.45s ease-out both; }
 .animate-float-xp { animation: float-xp 1.2s ease-out forwards; }
+.animate-bob { animation: bob 3.2s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -13,14 +13,14 @@ export function PillGroup({ name, legend, options, value, onChange, error, colum
   return (
     <fieldset aria-describedby={error ? `${name}-error` : undefined}>
       <legend className="mb-1.5 text-sm font-semibold">
-        {legend} <span className="text-brand">*</span>
+        {legend} <span className="text-brand-strong">*</span>
       </legend>
       <div className={`grid gap-3 ${columns === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
         {options.map(([v, label], i) => (
           <label
             key={v}
-            className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border-2 px-4 py-3 has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-brand ${
-              value === v ? "border-brand bg-brand/10" : error ? "border-danger bg-panel" : "border-line bg-panel"
+            className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border-2 px-4 py-3 has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-ink ${
+              value === v ? "border-ink bg-brand/25 shadow-[3px_3px_0_0_#14110f]" : error ? "border-danger bg-white" : "border-ink bg-white"
             }`}
           >
             <input
@@ -30,7 +30,7 @@ export function PillGroup({ name, legend, options, value, onChange, error, colum
               value={v}
               checked={value === v}
               onChange={() => onChange(v)}
-              className="accent-[#22d367]"
+              className="accent-[#3f9b50]"
             />
             {label}
           </label>

@@ -20,12 +20,12 @@ export function Confirmation() {
 
   return (
     <section className="animate-rise pt-10 text-center">
-      <div className="animate-pop relative mx-auto grid size-32 place-items-center rounded-[2rem] border-2 border-brand bg-brand/10 shadow-[0_0_60px_-10px_rgb(34_211_103/0.5)]" aria-hidden>
+      <div className="animate-pop nb-shadow relative mx-auto grid size-32 -rotate-3 place-items-center rounded-[2rem] border-2 border-ink bg-lane-sun" aria-hidden>
         <Image src="/logo.png" alt="" width={96} height={57} priority className="h-auto w-24" />
-        <span className="absolute -bottom-3 -right-3 grid size-9 place-items-center rounded-full border-4 border-ink bg-brand text-lg font-bold text-black">✓</span>
+        <span className="absolute -bottom-3 -right-3 grid size-9 place-items-center rounded-full border-4 border-ink bg-brand text-lg font-bold text-ink">✓</span>
       </div>
       <h1 className="mt-6 text-3xl font-extrabold leading-tight" role="status">Your consultation request has been submitted successfully!</h1>
-      <p className="mx-auto mt-4 max-w-md text-[#cfe0d6]">
+      <p className="mx-auto mt-4 max-w-md text-[#3e3730]">
         The DeboisTech team will contact you using the details you provided to coordinate your free consultation.
       </p>
       <p className="mx-auto mt-3 max-w-md text-sm text-muted">

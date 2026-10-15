@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IntroScreen } from "@/components/challenge/intro";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -90,12 +91,14 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
 
   return (
     <section aria-labelledby="q-heading" className="pt-2">
-      <div className="flex items-center justify-between font-mono text-sm">
-        <span aria-live="polite">Question {current + 1} of {TOTAL}</span>
-        <span className="relative rounded-full border border-brand/40 bg-brand/10 px-3 py-1 text-brand" aria-label={`${xp} XP earned`}>
+      <div className="flex items-center justify-between gap-3">
+        <span aria-live="polite" className="nb-shadow-sm rounded-full border-2 border-ink bg-white px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider">
+          Question {current + 1} of {TOTAL}
+        </span>
+        <span className="nb-shadow-sm relative rounded-full border-2 border-ink bg-brand px-3 py-1 font-mono text-sm font-bold" aria-label={`${xp} XP earned`}>
           {xp} XP
           {chosen && gain > 0 && (
-            <span key={question.id} aria-hidden className="animate-float-xp absolute -top-1 right-2 text-xs font-bold">+{gain}</span>
+            <span key={question.id} aria-hidden className="animate-float-xp absolute -top-2 right-2 text-xs font-extrabold">+{gain}</span>
           )}
         </span>
       </div>
@@ -105,18 +108,29 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
         aria-valuemax={TOTAL}
         aria-valuenow={answeredCount}
         aria-label="Challenge progress"
-        className="mt-3 h-2 overflow-hidden rounded-full bg-panel-2"
+        className="relative mt-4 h-10"
       >
-        <div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${(answeredCount / TOTAL) * 100}%` }} />
+        <div aria-hidden className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-ink/30" />
+        <div aria-hidden className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full border-2 border-ink bg-brand transition-[width] duration-500" style={{ width: `calc((100% - 3.4rem) * ${answeredCount / TOTAL} + 1.7rem)` }} />
+        <Image
+          src="/logo.png"
+          alt=""
+          width={54}
+          height={32}
+          aria-hidden
+          className="absolute top-0.5 h-9 w-auto transition-[left] duration-500"
+          style={{ left: `calc((100% - 3.4rem) * ${answeredCount / TOTAL})` }}
+        />
+        <span aria-hidden className="absolute right-0 top-1/2 -translate-y-1/2 text-xl">🏁</span>
       </div>
 
       <div key={question.id} className="animate-rise mt-6">
-        <p className="font-mono text-xs uppercase tracking-widest text-brand">{question.category}</p>
-        <h1 id="q-heading" ref={headingRef} tabIndex={-1} className="mt-2 text-2xl font-bold leading-snug outline-none sm:text-3xl">
+        <p className="inline-block rounded-full border-2 border-ink bg-lane-sun px-3 py-0.5 font-mono text-xs font-bold uppercase tracking-widest">{question.category}</p>
+        <h1 id="q-heading" ref={headingRef} tabIndex={-1} className="mt-3 font-display text-2xl font-extrabold leading-snug outline-none sm:text-3xl">
           {question.prompt}
         </h1>
         {question.snippet && (
-          <pre className="mt-4 overflow-x-auto rounded-xl border border-line bg-black/50 p-4 font-mono text-sm leading-relaxed"><code>{question.snippet}</code></pre>
+          <pre className="mt-4 overflow-x-auto rounded-xl border-2 border-ink bg-ink p-4 font-mono text-sm leading-relaxed text-paper shadow-[3px_3px_0_0_#3f9b50]"><code>{question.snippet}</code></pre>
         )}
 
         <div role="group" aria-label="Answer options" className="mt-5 grid gap-3">
@@ -126,12 +140,12 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
             const isRight = reveal && o.id === question.correctOptionId;
             const isWrong = reveal && selected && !isRight;
             const tone = isRight
-              ? "border-brand bg-brand/15"
+              ? "border-ink bg-[#bfe5c8] shadow-[3px_3px_0_0_#14110f]"
               : isWrong
-                ? "border-danger bg-danger/10"
+                ? "border-danger bg-lane-pink shadow-[3px_3px_0_0_#c0281f]"
                 : selected
-                  ? "border-brand bg-brand/10"
-                  : "border-line bg-panel hover:border-brand/60";
+                  ? "border-ink bg-brand/25 shadow-[3px_3px_0_0_#14110f]"
+                  : "border-ink bg-white shadow-[3px_3px_0_0_#14110f] hover:-translate-y-0.5 hover:bg-panel-2";
             return (
               <button
                 key={o.id}
@@ -139,9 +153,9 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
                 aria-pressed={selected}
                 aria-disabled={!!chosen}
                 onClick={() => pick(o.id)}
-                className={`flex min-h-14 w-full items-start gap-3 rounded-xl border-2 px-4 py-3 text-left text-base transition ${tone} ${chosen && !selected && !isRight ? "opacity-60" : ""}`}
+                className={`flex min-h-14 w-full items-start gap-3 rounded-xl border-2 px-4 py-3 text-left text-base font-medium transition ${tone} ${chosen && !selected && !isRight ? "opacity-60 shadow-none" : ""}`}
               >
-                <span aria-hidden className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md border border-current font-mono text-xs uppercase">
+                <span aria-hidden className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg border-2 border-ink bg-white font-mono text-xs font-bold uppercase">
                   {isRight ? "✓" : isWrong ? "✗" : String.fromCharCode(97 + i)}
                 </span>
                 <span>
@@ -156,7 +170,7 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
 
         <div aria-live="polite" className="mt-4 min-h-6">
           {chosen && (
-            <div className="animate-rise rounded-xl border border-line bg-panel-2 p-4 text-sm">
+            <div className={`animate-rise nb-card p-4 text-sm ${question.kind === "knowledge" && wasCorrect ? "bg-lane-green" : "bg-lane-sun"}`}>
               <p className="font-semibold">
                 {question.kind === "knowledge"
                   ? wasCorrect
@@ -164,7 +178,7 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
                     : "Not quite, and that is fine."
                   : `Noted! +${XP_PREFERENCE} XP`}
               </p>
-              <p className="mt-1 text-muted">{question.explanation}</p>
+              <p className="mt-1 text-[#3e3730]">{question.explanation}</p>
             </div>
           )}
         </div>
@@ -185,20 +199,20 @@ function ChallengeRun({ questions }: { questions: Question[] }) {
 function Completion(props: { xp: number; maxXp: number; correct: number; knowledgeTotal: number; onReview: () => void }) {
   return (
     <section aria-labelledby="done" className="animate-rise pt-8 text-center">
-      <div className="animate-pop mx-auto grid size-32 place-items-center rounded-[2rem] border-2 border-brand bg-brand/10 shadow-[0_0_60px_-10px_rgb(34_211_103/0.5)]">
+      <div className="animate-pop nb-shadow mx-auto grid size-32 -rotate-3 place-items-center rounded-[2rem] border-2 border-ink bg-lane-sun">
         <span aria-hidden className="text-6xl">🧭</span>
       </div>
-      <p className="mt-5 font-mono text-sm uppercase tracking-widest text-brand">Badge unlocked</p>
-      <h1 id="done" className="mt-1 text-4xl font-extrabold">Tech Explorer</h1>
+      <p className="mt-5 font-mono text-sm uppercase tracking-widest text-brand-strong">Badge unlocked</p>
+      <h1 id="done" className="mt-1 font-display text-5xl font-extrabold">Tech Explorer</h1>
       <p className="mx-auto mt-3 max-w-md text-muted">You finished the challenge. Here is how you did, then your suggested tech lane.</p>
       <dl className="mx-auto mt-6 grid max-w-sm grid-cols-2 gap-3">
-        <div className="rounded-xl border border-line bg-panel p-4">
+        <div className="nb-card p-4">
           <dt className="text-xs text-muted">XP earned</dt>
-          <dd className="font-mono text-2xl font-bold text-brand">{props.xp}<span className="text-sm text-muted"> / {props.maxXp}</span></dd>
+          <dd className="font-mono text-2xl font-bold text-brand-strong">{props.xp}<span className="text-sm text-muted"> / {props.maxXp}</span></dd>
         </div>
-        <div className="rounded-xl border border-line bg-panel p-4">
+        <div className="nb-card p-4">
           <dt className="text-xs text-muted">Knowledge questions</dt>
-          <dd className="font-mono text-2xl font-bold text-brand">{props.correct}<span className="text-sm text-muted"> / {props.knowledgeTotal}</span></dd>
+          <dd className="font-mono text-2xl font-bold text-brand-strong">{props.correct}<span className="text-sm text-muted"> / {props.knowledgeTotal}</span></dd>
         </div>
       </dl>
       <p className="mx-auto mt-3 max-w-sm text-xs text-muted">XP is just for fun. It is not a measure of your ability or career suitability.</p>

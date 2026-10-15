@@ -17,16 +17,16 @@ export function IntroScreen({ total, onStart }: { total: number; onStart: () => 
 
   return (
     <section aria-labelledby="intro" className="animate-rise pt-6">
-      <p className="font-mono text-xs uppercase tracking-widest text-brand">Before you start</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-brand-strong">Before you start</p>
       <h1 id="intro" ref={heading} tabIndex={-1} className="mt-2 text-3xl font-extrabold leading-tight outline-none sm:text-4xl">
         Ready to find your tech lane?
       </h1>
       <ul className="mt-6 grid gap-3">
         {rules.map((r) => (
-          <li key={r.title} className="flex gap-3 rounded-2xl border border-line bg-panel p-4">
-            <span aria-hidden className="text-2xl">{r.icon}</span>
+          <li key={r.title} className="nb-card flex gap-3 p-4">
+            <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-ink bg-lane-sun text-2xl">{r.icon}</span>
             <div>
-              <h2 className="font-bold">{r.title}</h2>
+              <h2 className="font-display text-lg font-extrabold">{r.title}</h2>
               <p className="mt-0.5 text-sm text-muted">{r.text}</p>
             </div>
           </li>

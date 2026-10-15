@@ -141,14 +141,14 @@ export function ConsultationForm() {
 
       <form ref={formRef} onSubmit={onSubmit} noValidate className="mt-6 space-y-5" aria-busy={submitting}>
         {banner && (
-          <div role="alert" className="rounded-xl border border-danger/60 bg-danger/10 p-4 text-sm">
+          <div role="alert" className="rounded-xl border-2 border-danger bg-lane-pink p-4 text-sm">
             <p className="font-semibold text-danger">{banner}</p>
             {!Object.keys(errors).length && <p className="mt-1 text-muted">Your answers are still here. Press “Request Free Consultation” to retry.</p>}
           </div>
         )}
-        <p className="text-xs text-muted"><span className="text-brand">*</span> required</p>
+        <p className="text-xs text-muted"><span className="text-brand-strong">*</span> required</p>
 
-        <h2 className="border-t border-line pt-5 font-mono text-xs uppercase tracking-widest text-brand">About you</h2>
+        <h2 className="border-t-2 border-dashed border-ink/30 pt-5 font-mono text-xs font-bold uppercase tracking-[0.25em] text-brand-strong">About you</h2>
 
         <Field id="name" label="Full name" required error={errors.name}>
           {(p) => <input {...p} className={inputClass} value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" maxLength={100} />}
@@ -175,7 +175,7 @@ export function ConsultationForm() {
           {(p) => <input {...p} className={inputClass} value={form.organisation} onChange={(e) => set("organisation", e.target.value)} autoComplete="organization" maxLength={150} />}
         </Field>
 
-        <h2 className="border-t border-line pt-5 font-mono text-xs uppercase tracking-widest text-brand">Your consultation</h2>
+        <h2 className="border-t-2 border-dashed border-ink/30 pt-5 font-mono text-xs font-bold uppercase tracking-[0.25em] text-brand-strong">Your consultation</h2>
 
         <Field id="selectedTrack" label="Technology track" required error={errors.selectedTrack} hint="Pre-filled with the track you chose. You can change it.">
           {(p) => (
@@ -203,21 +203,21 @@ export function ConsultationForm() {
           )}
         </Field>
 
-        <h2 className="border-t border-line pt-5 font-mono text-xs uppercase tracking-widest text-brand">Consent</h2>
+        <h2 className="border-t-2 border-dashed border-ink/30 pt-5 font-mono text-xs font-bold uppercase tracking-[0.25em] text-brand-strong">Consent</h2>
 
-        <div className="space-y-3 rounded-2xl border border-line bg-panel p-4 text-sm">
+        <div className="nb-card space-y-3 p-4 text-sm">
           <p className="text-muted">
             We collect your details only so the DeboisTech team can contact you about your free consultation on{" "}
-            <strong className="text-white">{getTrack(selected).name}</strong>.{" "}
+            <strong className="text-ink">{getTrack(selected).name}</strong>.{" "}
             {PRIVACY_CONTACT ? `To correct or delete your details, contact ${PRIVACY_CONTACT}.` : "To correct or delete your details, ask any DeboisTech team member."}
           </p>
           <label className="flex cursor-pointer items-start gap-3">
-            <input id="consent" type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={!!errors.consent} aria-describedby={errors.consent ? "consent-error" : undefined} className="mt-1 size-5 shrink-0 accent-[#22d367]" />
-            <span>I agree that DeboisTech may contact me about my consultation request. <span className="text-brand">*</span></span>
+            <input id="consent" type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={!!errors.consent} aria-describedby={errors.consent ? "consent-error" : undefined} className="mt-1 size-5 shrink-0 accent-[#3f9b50]" />
+            <span>I agree that DeboisTech may contact me about my consultation request. <span className="text-brand-strong">*</span></span>
           </label>
           {errors.consent && <p id="consent-error" role="alert" className="font-medium text-danger">{errors.consent}</p>}
           <label className="flex cursor-pointer items-start gap-3">
-            <input id="marketingConsent" type="checkbox" checked={form.marketingConsent} onChange={(e) => set("marketingConsent", e.target.checked)} className="mt-1 size-5 shrink-0 accent-[#22d367]" />
+            <input id="marketingConsent" type="checkbox" checked={form.marketingConsent} onChange={(e) => set("marketingConsent", e.target.checked)} className="mt-1 size-5 shrink-0 accent-[#3f9b50]" />
             <span>Also keep me updated about DeboisTech workshops and programs. <span className="text-muted">(optional)</span></span>
           </label>
         </div>

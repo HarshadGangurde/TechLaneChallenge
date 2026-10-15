@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { ComponentProps, Ref } from "react";
 
 const base =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border-2 px-6 py-3 text-base font-bold transition active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:translate-x-0 disabled:active:translate-y-0";
 const variants = {
-  primary: "bg-brand text-black hover:bg-[#3df07f] disabled:hover:bg-brand",
-  secondary: "border border-line bg-panel-2 text-white hover:border-brand/60",
-  ghost: "text-muted hover:text-white",
+  primary: "border-ink bg-brand text-ink shadow-[4px_4px_0_0_#14110f] hover:bg-[#4aae5c] disabled:hover:bg-brand",
+  secondary: "border-ink bg-white text-ink shadow-[4px_4px_0_0_#14110f] hover:bg-panel-2",
+  ghost: "border-transparent px-3 text-muted underline-offset-4 hover:text-ink hover:underline",
 } as const;
 
 type Variant = keyof typeof variants;
