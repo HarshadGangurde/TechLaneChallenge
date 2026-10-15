@@ -1,4 +1,5 @@
 import { LandingTracker } from "@/components/landing/landing-tracker";
+import { LaneCard } from "@/components/landing/lane-card";
 import { PixelDoodle } from "@/components/landing/pixel-doodle";
 import { ButtonLink } from "@/components/ui/button";
 import { Shell } from "@/components/ui/shell";
@@ -82,13 +83,12 @@ export default function Home() {
 
       <section aria-labelledby="lanes" className="mt-10">
         <h2 id="lanes" className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-muted">Six tech lanes to discover</h2>
+        <p className="mt-2 text-sm text-muted">
+          This challenge doesn&apos;t rank you. It only points you to the domain that fits you best, so you know where to start.
+        </p>
         <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {TRACK_LIST.map((t, i) => (
-            <li key={t.id} className={`nb-card ${laneColours[i % 6]} ${laneTilt[i % 6]} p-3`}>
-              <span aria-hidden className="text-2xl">{t.emoji}</span>
-              <p className="mt-1 font-display text-base font-extrabold leading-tight">{t.name}</p>
-              <p className="mt-1 text-xs text-[#3e3730]">{t.tagline}</p>
-            </li>
+            <LaneCard key={t.id} track={t} tone={laneColours[i % 6]} tilt={laneTilt[i % 6]} />
           ))}
         </ul>
       </section>
