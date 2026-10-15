@@ -76,6 +76,13 @@ describe("parseLeadPayload", () => {
     expect(parseLeadPayload({ ...valid, availability: "whenever" }).ok).toBe(false);
   });
 
+  it("says a field is required (not too short) when it is left empty", () => {
+    const r = parseLeadPayload({ ...valid, name: "", organisation: "  " });
+    expect(!r.ok && r.errors.name).toBe("Full name is required.");
+    expect(!r.ok && r.errors.organisation).toBe("College or organisation is required.");
+    const short = parseLeadPayload({ ...valid, name: "A" });
+    expect(!short.ok && short.errors.name).toBe("Full name must be at least 2 characters.");
+  });
   it("requires an email and rejects blank or whitespace-only values", () => {
     for (const email of ["", "   ", undefined]) {
       const r = parseLeadPayload({ ...valid, email });

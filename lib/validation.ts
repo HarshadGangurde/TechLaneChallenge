@@ -29,7 +29,8 @@ const text = (label: string, min: number, max: number) =>
     cleanText,
     z
       .string({ error: `${label} is required.` })
-      .min(min, min <= 1 ? `${label} is required.` : `${label} must be at least ${min} characters.`)
+      .min(1, `${label} is required.`)
+      .min(min, `${label} must be at least ${min} characters.`)
       .max(max, `${label} must be at most ${max} characters.`),
   );
 

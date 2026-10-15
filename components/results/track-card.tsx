@@ -15,11 +15,11 @@ export function TrackDetails({ track }: { track: Track }) {
     <div className="mt-4 space-y-4 text-sm">
       <p className="text-[#cfe0d6]">{track.description}</p>
       <div>
-        <h4 className="font-mono text-xs uppercase tracking-widest text-muted">Career path</h4>
+        <h3 className="font-mono text-xs uppercase tracking-widest text-muted">Career path</h3>
         <p className="mt-1">{track.careerPath}</p>
       </div>
       <div>
-        <h4 className="font-mono text-xs uppercase tracking-widest text-muted">Skills to explore</h4>
+        <h3 className="font-mono text-xs uppercase tracking-widest text-muted">Skills to explore</h3>
         <ul className="mt-2 flex flex-wrap gap-2">
           {track.skills.map((s) => (
             <li key={s} className="rounded-full border border-line bg-panel-2 px-3 py-1">{s}</li>
@@ -27,7 +27,7 @@ export function TrackDetails({ track }: { track: Track }) {
         </ul>
       </div>
       <div className="rounded-xl border border-dashed border-brand/40 bg-brand/5 p-3">
-        <h4 className="font-mono text-xs uppercase tracking-widest text-brand">Beginner project idea</h4>
+        <h3 className="font-mono text-xs uppercase tracking-widest text-brand">Beginner project idea</h3>
         <p className="mt-1">{track.project}</p>
       </div>
     </div>

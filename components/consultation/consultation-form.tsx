@@ -94,6 +94,7 @@ export function ConsultationForm() {
     const check = parseLeadPayload(payload);
     if (!check.ok) {
       setErrors(check.errors);
+      setBanner("Please check the highlighted fields.");
       requestAnimationFrame(() => focusFirstError(check.errors));
       return;
     }
