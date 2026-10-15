@@ -24,7 +24,7 @@ interface FormState {
 }
 
 const initial: FormState = {
-  name: "", phone: "", email: "", organisation: "", status: "", format: "", availability: "",
+  name: "", phone: "+91 ", email: "", organisation: "", status: "", format: "", availability: "",
   consent: false, marketingConsent: false, website: "",
 };
 
