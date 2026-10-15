@@ -7,14 +7,22 @@ import { TRACK_IDS, type Answers, type Question, type TrackId } from "@/types";
 const seeds = Array.from({ length: 200 }, (_, i) => `seed-${i}`);
 
 describe("question bank supports randomisation", () => {
-  it("has at least two knowledge questions for every track", () => {
+  it("has at least six knowledge questions for every track", () => {
     for (const t of TRACK_IDS) {
       const n = QUESTIONS.filter((q) => q.kind === "knowledge" && primaryTrack(q) === t).length;
-      expect(n, t).toBeGreaterThanOrEqual(2);
+      expect(n, t).toBeGreaterThanOrEqual(6);
     }
   });
-  it("has more preference questions than one run uses", () => {
-    expect(QUESTIONS.filter((q) => q.kind === "preference").length).toBeGreaterThan(PREFERENCE_PER_RUN);
+  it("has at least 16 preference questions, well above what one run uses", () => {
+    expect(QUESTIONS.filter((q) => q.kind === "preference").length).toBeGreaterThanOrEqual(16);
+    expect(QUESTIONS.filter((q) => q.kind === "preference").length).toBeGreaterThan(PREFERENCE_PER_RUN * 3);
+  });
+  it("uses the whole bank across 600 students, with little overlap between two students", () => {
+    const sets = Array.from({ length: 600 }, (_, i) => selectQuestions(`student-${i}`).map((q) => q.id));
+    expect(new Set(sets.flat()).size).toBe(QUESTIONS.length);
+    let overlap = 0;
+    for (let i = 0; i < 599; i++) overlap += sets[i].filter((id) => sets[i + 1].includes(id)).length;
+    expect(overlap / 599).toBeLessThan(2.5); // avg shared questions between two students out of 10
   });
 });
 
