@@ -4,11 +4,11 @@ import { normalizePhone, parseLeadPayload } from "@/lib/validation";
 const valid = {
   name: "  Asha   Patil ",
   phone: "+91 98765 43210",
-  email: "",
+  email: "asha@example.com",
   organisation: "KK Wagh College",
   status: "college_student",
   selectedTrack: "mobile",
-  format: "online",
+  format: "office_visit",
   availability: "Weekends",
   consent: true,
   marketingConsent: false,
@@ -35,7 +35,7 @@ describe("parseLeadPayload", () => {
     if (r.ok) {
       expect(r.data.name).toBe("Asha Patil");
       expect(r.data.phone).toBe("+919876543210");
-      expect(r.data.email).toBeUndefined();
+      expect(r.data.email).toBe("asha@example.com");
       expect(r.data.campaign).toBe("GDG_NASHIK_DEVFEST_2026");
       expect(r.data.source).toBe("direct");
     }
@@ -45,7 +45,7 @@ describe("parseLeadPayload", () => {
     const r = parseLeadPayload({ idempotencyKey: valid.idempotencyKey });
     expect(r.ok).toBe(false);
     if (!r.ok) {
-      for (const f of ["name", "phone", "organisation", "status", "selectedTrack", "format", "availability", "consent"]) {
+      for (const f of ["name", "phone", "email", "organisation", "status", "selectedTrack", "format", "availability", "consent"]) {
         expect(r.errors[f]).toBeTruthy();
       }
     }
@@ -76,6 +76,20 @@ describe("parseLeadPayload", () => {
     expect(parseLeadPayload({ ...valid, availability: "whenever" }).ok).toBe(false);
   });
 
+  it("says a field is required (not too short) when it is left empty", () => {
+    const r = parseLeadPayload({ ...valid, name: "", organisation: "  " });
+    expect(!r.ok && r.errors.name).toBe("Full name is required.");
+    expect(!r.ok && r.errors.organisation).toBe("College or organisation is required.");
+    const short = parseLeadPayload({ ...valid, name: "A" });
+    expect(!short.ok && short.errors.name).toBe("Full name must be at least 2 characters.");
+  });
+  it("requires an email and rejects blank or whitespace-only values", () => {
+    for (const email of ["", "   ", undefined]) {
+      const r = parseLeadPayload({ ...valid, email });
+      expect(r.ok, String(email)).toBe(false);
+      if (!r.ok) expect(r.errors.email).toBe("Email is required.");
+    }
+  });
   it("accepts an email when supplied and keeps marketing consent separate", () => {
     const r = parseLeadPayload({ ...valid, email: "asha@example.com", marketingConsent: true });
     expect(r.ok && r.data.email).toBe("asha@example.com");
@@ -95,8 +109,10 @@ describe("parseLeadPayload", () => {
     expect(ok.ok && ok.data.source).toBe("booth");
   });
 
-  it("requires an idempotency key and an empty honeypot", () => {
+  it("requires an idempotency key and lets the route handle a filled honeypot", () => {
     expect(parseLeadPayload({ ...valid, idempotencyKey: "short" }).ok).toBe(false);
-    expect(parseLeadPayload({ ...valid, website: "http://spam" }).ok).toBe(false);
+    const r = parseLeadPayload({ ...valid, website: "http://spam" });
+    expect(r.ok && r.data.website).toBe("http://spam");
+    expect(parseLeadPayload({ ...valid, website: "x".repeat(201) }).ok).toBe(false);
   });
 });

@@ -10,7 +10,7 @@ interface FieldProps {
 }
 
 export const inputClass =
-  "min-h-12 w-full rounded-xl border-2 border-line bg-panel px-4 py-3 text-base text-white placeholder:text-muted/70 focus:border-brand";
+  "min-h-12 w-full rounded-xl border-2 border-ink bg-white px-4 py-3 text-base text-ink placeholder:text-muted/70 focus:shadow-[3px_3px_0_0_#2c8441] aria-invalid:border-danger aria-invalid:shadow-[3px_3px_0_0_#c0281f]";
 
 export function Field({ id, label, required, hint, error, children }: FieldProps) {
   const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
@@ -18,7 +18,7 @@ export function Field({ id, label, required, hint, error, children }: FieldProps
     <div>
       <label htmlFor={id} className="mb-1.5 block text-sm font-semibold">
         {label}{" "}
-        <span className={required ? "text-brand" : "font-normal text-muted"}>{required ? "*" : "(optional)"}</span>
+        <span className={required ? "text-brand-strong" : "font-normal text-muted"}>{required ? "*" : "(optional)"}</span>
       </label>
       {children({ id, "aria-describedby": describedBy, "aria-invalid": !!error })}
       {hint && <p id={`${id}-hint`} className="mt-1 text-xs text-muted">{hint}</p>}

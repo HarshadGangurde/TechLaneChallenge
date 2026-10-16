@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 
 const ipLimiter = createRateLimiter(40, 10 * 60_000); // venue Wi-Fi shares one IP, so keep this generous
 const phoneLimiter = createRateLimiter(3, 60 * 60_000);
-const seenRequests = new Set<string>();
+const seenRequests = new Set<string>(); // insertion-ordered; oldest entries are evicted first
+const MAX_SEEN_REQUESTS = 5000;
 const MAX_BODY_BYTES = 8_000;
 
 const json = (body: object, status: number, headers?: HeadersInit) =>
@@ -47,7 +48,10 @@ export async function POST(request: Request) {
   // same request (double-tap, retry after a failure) are not counted.
   const requestId = payload.phone + payload.idempotencyKey;
   if (!seenRequests.has(requestId)) {
-    if (seenRequests.size > 5000) seenRequests.clear();
+    if (seenRequests.size >= MAX_SEEN_REQUESTS) {
+      const oldest = seenRequests.values().next().value;
+      if (oldest !== undefined) seenRequests.delete(oldest);
+    }
     seenRequests.add(requestId);
     if (!phoneLimiter.check(payload.phone).allowed) {
       return json({ ok: false, error: "rate_limited", message: "This number has submitted several requests recently. Please wait before trying again." }, 429);

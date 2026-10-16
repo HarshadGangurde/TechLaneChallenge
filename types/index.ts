@@ -33,6 +33,8 @@ export interface AnswerOption {
 export interface Question {
   id: string;
   kind: QuestionKind;
+  /** Optional emoji shown beside the category tag. */
+  emoji?: string;
   /** Short label such as "Scenario" or "Debugging". */
   category: string;
   prompt: string;
@@ -80,5 +82,5 @@ export const CURRENT_STATUSES = [
 ] as const;
 export type CurrentStatus = (typeof CURRENT_STATUSES)[number];
 
-export const CONSULTATION_FORMATS = ["online", "phone_call"] as const;
+export const CONSULTATION_FORMATS = ["phone_call", "office_visit"] as const;
 export type ConsultationFormat = (typeof CONSULTATION_FORMATS)[number];

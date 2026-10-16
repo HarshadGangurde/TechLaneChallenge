@@ -1,9 +1,11 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import { DEFAULT_CAMPAIGN } from "@/lib/constants";
+import { questionsForAnswers } from "@/lib/question-set";
 import { recommend } from "@/lib/scoring";
 import { getTrack } from "@/lib/tracks";
 import { STATUS_LABELS, FORMAT_LABELS } from "@/lib/constants";
+import type { SheetCell } from "@/lib/google-sheets";
 import { StorageError, type SheetsGateway } from "@/lib/google-sheets";
 import type { LeadPayload } from "@/lib/validation";
 
@@ -59,16 +61,16 @@ export function buildLeadRecord(p: LeadPayload, now: Date = new Date()): LeadRec
   let recommendedTrack = "";
   let challengeScore = "";
   if (p.answers && Object.keys(p.answers).length > 0) {
-    const r = recommend(p.answers);
+    const r = recommend(p.answers, questionsForAnswers(p.answers));
     recommendedTrack = getTrack(r.primary).name;
     challengeScore = `${r.score.xp}/${r.score.maxXp}`;
   }
   return {
     leadId: leadIdFromKey(p.idempotencyKey),
-    createdAt: now.toISOString(),
+    createdAt: formatSheetTimestamp(now),
     name: p.name,
     phone: p.phone,
-    email: p.email ?? "",
+    email: p.email,
     organisation: p.organisation,
     status: STATUS_LABELS[p.status],
     recommendedTrack,
@@ -85,11 +87,32 @@ export function buildLeadRecord(p: LeadPayload, now: Date = new Date()): LeadRec
   };
 }
 
-export function recordToRow(r: LeadRecord): string[] {
+/** "2026-10-25 15:30:00" in India time, matching how staff read the sheet. */
+export function formatSheetTimestamp(d: Date): string {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "short",
+    timeStyle: "medium",
+  }).format(d);
+}
+
+/** "60/80" -> 0.75, so the sheet can average it and show it as a percentage. Blank if there is no score. */
+function scoreFraction(score: string): number | "" {
+  const m = /^(\d+)\/(\d+)$/.exec(score);
+  if (!m || Number(m[2]) === 0) return "";
+  return Math.round((Number(m[1]) / Number(m[2])) * 10_000) / 10_000;
+}
+
+/**
+ * The row as written to the sheet. Consent flags are real booleans (they land
+ * in checkbox cells and can be counted) and the score is a number; everything
+ * else stays text, written RAW so nothing is parsed as a formula.
+ */
+export function recordToRow(r: LeadRecord): SheetCell[] {
   return [
     r.leadId, r.createdAt, r.name, r.phone, r.email, r.organisation, r.status,
-    r.recommendedTrack, r.selectedTrack, r.challengeScore, r.format, r.availability,
-    r.consent, r.marketingConsent, r.source, r.campaign, r.leadStatus, r.notes,
+    r.recommendedTrack, r.selectedTrack, scoreFraction(r.challengeScore), r.format, r.availability,
+    r.consent === "Yes", r.marketingConsent === "Yes", r.source, r.campaign, r.leadStatus, r.notes,
   ];
 }
 
@@ -106,6 +129,14 @@ export interface SaveResult {
 
 // Remembers leads saved by this instance so a double-tap never re-appends.
 const recentLeadIds = new Set<string>();
+const MAX_RECENT_LEADS = 10_000;
+function rememberLead(id: string) {
+  if (recentLeadIds.size >= MAX_RECENT_LEADS) {
+    const oldest = recentLeadIds.values().next().value;
+    if (oldest !== undefined) recentLeadIds.delete(oldest);
+  }
+  recentLeadIds.add(id);
+}
 export function _resetRecentLeadsForTests() {
   recentLeadIds.clear();
 }
@@ -136,11 +167,11 @@ export async function saveLead(
       // Always look first: a previous request (maybe on another instance, maybe
       // one that timed out after Google accepted it) may already have written it.
       if (await leadExists(gateway, record.leadId).catch(() => false)) {
-        recentLeadIds.add(record.leadId);
+        rememberLead(record.leadId);
         return { leadId: record.leadId, duplicate: true };
       }
       await gateway.appendRow(recordToRow(record));
-      recentLeadIds.add(record.leadId);
+      rememberLead(record.leadId);
       return { leadId: record.leadId, duplicate: false };
     } catch (err) {
       lastError = err instanceof StorageError ? err : new StorageError("Unexpected storage failure", "transient");
@@ -149,4 +180,14 @@ export async function saveLead(
     }
   }
   throw lastError!;
+}
+
+/**
+ * Classify a sheet's first row: "match" (exact header), "none" (data starts in
+ * row 1), or "mismatch" (looks like a header but columns differ, which would
+ * silently mis-map every export column).
+ */
+export function headerRowStatus(firstRow: string[] | undefined): "match" | "none" | "mismatch" {
+  if (!firstRow || firstRow[0] !== SHEET_HEADERS[0]) return "none";
+  return SHEET_HEADERS.every((h, i) => firstRow[i] === h) ? "match" : "mismatch";
 }

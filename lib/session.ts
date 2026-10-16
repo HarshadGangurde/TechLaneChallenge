@@ -1,8 +1,9 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
+import { newSeed, selectQuestions } from "@/lib/question-set";
 import { isTrackId } from "@/lib/tracks";
-import type { Answers, TrackId } from "@/types";
+import type { Answers, Question, TrackId } from "@/types";
 
 /**
  * Challenge progress lives in sessionStorage only (nothing personal), so a
@@ -10,6 +11,7 @@ import type { Answers, TrackId } from "@/types";
  */
 const KEYS = {
   answers: "tlc:answers",
+  seed: "tlc:seed",
   selected: "tlc:selected",
   idem: "tlc:idem",
   source: "tlc:source",
@@ -68,6 +70,14 @@ export function parseAnswers(raw: string | null | undefined): Answers {
 export function useAnswersRaw() {
   return useRaw(KEYS.answers);
 }
+/**
+ * This student's random question run. `undefined` before hydration, `null`
+ * until a seed exists (the challenge page creates it), then the fixed set.
+ */
+export function useQuestionSet(): Question[] | null | undefined {
+  const seed = useRaw(KEYS.seed);
+  return useMemo(() => (seed === undefined ? undefined : seed === null ? null : selectQuestions(seed)), [seed]);
+}
 export function useSelectedTrack(): TrackId | null | undefined {
   const raw = useRaw(KEYS.selected);
   if (raw === undefined) return undefined;
@@ -84,8 +94,13 @@ export const session = {
     if (current[questionId]) return; // first answer wins: no duplicate scoring
     write(KEYS.answers, JSON.stringify({ ...current, [questionId]: optionId }));
   },
+  /** Create this student's question seed if they do not have one yet. */
+  ensureSeed() {
+    if (!read(KEYS.seed)) write(KEYS.seed, newSeed());
+  },
   resetChallenge() {
     write(KEYS.answers, null);
+    write(KEYS.seed, null); // a retake draws a fresh set of questions
     write(KEYS.selected, null);
   },
   setSelectedTrack: (id: TrackId) => write(KEYS.selected, id),

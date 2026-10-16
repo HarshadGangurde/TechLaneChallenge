@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
+import { MatchChart } from "@/components/results/match-chart";
 import { CompactTrackCard, FeaturedTrackCard } from "@/components/results/track-card";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
 import { explainRecommendation } from "@/lib/explain";
-import { QUESTIONS } from "@/lib/questions";
 import { recommend } from "@/lib/scoring";
-import { parseAnswers, session, useAnswersRaw, useSelectedTrack } from "@/lib/session";
+import { parseAnswers, session, useAnswersRaw, useQuestionSet, useSelectedTrack } from "@/lib/session";
 import { getTrack, TRACK_LIST } from "@/lib/tracks";
 import type { TrackId } from "@/types";
 
@@ -15,10 +15,11 @@ export function Results() {
   const raw = useAnswersRaw();
   const selected = useSelectedTrack();
   const answers = useMemo(() => parseAnswers(raw), [raw]);
-  const complete = QUESTIONS.every((q) => answers[q.id]);
-  const rec = useMemo(() => (complete ? recommend(answers) : null), [complete, answers]);
+  const questions = useQuestionSet();
+  const complete = !!questions?.length && questions.every((q) => answers[q.id]);
+  const rec = useMemo(() => (complete && questions ? recommend(answers, questions) : null), [complete, answers, questions]);
 
-  if (raw === undefined || selected === undefined) {
+  if (raw === undefined || selected === undefined || questions === undefined) {
     return <div className="mt-10 h-64 animate-pulse rounded-2xl bg-panel" aria-label="Loading results" />;
   }
 
@@ -43,7 +44,7 @@ export function Results() {
 
   return (
     <div className="pb-32 pt-2">
-      <p className="font-mono text-sm uppercase tracking-widest text-brand">Your suggested tech lane</p>
+      <p className="font-mono text-sm uppercase tracking-widest text-brand-strong">Your suggested tech lane</p>
       <h1 className="sr-only">Your track recommendation</h1>
 
       <div className="mt-3">
@@ -53,7 +54,7 @@ export function Results() {
           onChoose={choose}
           badge="★ Best match"
           featured
-          explanation={explainRecommendation(rec)}
+          explanation={explainRecommendation(rec, questions ?? [])}
         />
       </div>
 
@@ -62,6 +63,8 @@ export function Results() {
           <FeaturedTrackCard track={secondary} selected={selected === secondary.id} onChoose={choose} badge="Also a strong fit" />
         </div>
       )}
+
+      <MatchChart ranking={rec.ranking} scores={rec.scores} />
 
       <section aria-labelledby="others" className="mt-8">
         <h2 id="others" className="text-lg font-bold">Explore {secondary ? "other" : "the other"} tracks</h2>
@@ -80,10 +83,10 @@ export function Results() {
         Retake the challenge
       </Button>
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-ink/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper/95 backdrop-blur">
         <div className="mx-auto flex max-w-2xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <p aria-live="polite" className="text-sm text-muted">
-            {selected ? <>Your track: <strong className="text-white">{getTrack(selected).name}</strong></> : "Choose a track above to unlock your free consultation request."}
+            {selected ? <>Your track: <strong className="text-ink">{getTrack(selected).name}</strong></> : "Choose a track above to unlock your free consultation request."}
           </p>
           {selected ? (
             <ButtonLink href="/consultation" className="sm:min-w-64">Request Free Consultation →</ButtonLink>

@@ -2,9 +2,12 @@ import "server-only";
 import { JWT } from "google-auth-library";
 import { getSheetsConfig, type SheetsConfig } from "@/lib/config";
 
+/** A cell value written to the sheet. */
+export type SheetCell = string | number | boolean;
+
 /** Minimal surface the app needs from Sheets; tests inject a fake. */
 export interface SheetsGateway {
-  appendRow(values: string[]): Promise<void>;
+  appendRow(values: SheetCell[]): Promise<void>;
   /** All rows including the header row (if any). */
   readRows(): Promise<string[][]>;
 }
@@ -42,14 +45,14 @@ function toStorageError(err: unknown): StorageError {
 
 export function createSheetsGateway(config: SheetsConfig = getSheetsConfig()): SheetsGateway {
   const client = new JWT({ email: config.clientEmail, key: config.privateKey, scopes: [SCOPE] });
-  const range = encodeURIComponent(`'${config.sheetName.replace(/'/g, "''")}'`);
+  const range = encodeURIComponent(`'${config.sheetName.replace(/'/g, "''")}'!${config.tableRange}`);
   const base = `${API}/${encodeURIComponent(config.spreadsheetId)}/values`;
 
   return {
     async appendRow(values) {
       try {
         await client.request({
-          url: `${base}/${range}!A1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+          url: `${base}/${range}:append?valueInputOption=RAW&insertDataOption=OVERWRITE`,
           method: "POST",
           data: { values: [values] },
           timeout: 10_000,

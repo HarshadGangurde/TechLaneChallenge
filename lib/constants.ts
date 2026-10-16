@@ -17,8 +17,8 @@ export const STATUS_LABELS = {
 } as const;
 
 export const FORMAT_LABELS = {
-  online: "Online",
   phone_call: "Phone call",
+  office_visit: "Office visit",
 } as const;
 
 export const LEAD_STATUSES = ["New", "Contacted", "Scheduled", "Completed", "Closed"] as const;
