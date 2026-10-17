@@ -12,7 +12,7 @@ export function IntroScreen({ total, onStart }: { total: number; onStart: () => 
     { icon: "🎯", title: `${total} quick questions`, text: "Scenarios, mini-debugging and what you enjoy building. About 2–4 minutes." },
     { icon: "⚡", title: "Earn XP as you go", text: `+${XP_CORRECT} XP for a correct answer, +${XP_PREFERENCE} XP for each preference question.` },
     { icon: "🧭", title: "No pressure", text: "Preference questions have no wrong answers, and every answer comes with a short tip. No experience needed." },
-    { icon: "🏅", title: "Unlock your badge", text: "Finish to earn the Tech Explorer badge and see your suggested tech lane. No contact details needed." },
+    { icon: "🏅", title: "Unlock your badge", text: "Finish to earn the Tech Explorer badge and see your suggested tech lane." },
   ];
 
   return (

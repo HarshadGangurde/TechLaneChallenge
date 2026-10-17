@@ -1,5 +1,4 @@
-import { BrandLogo } from "@/components/ui/brand-logo";
-import { DevFestMark, GdgNashikLockup } from "@/components/ui/event-logos";
+import { DevFestMark } from "@/components/ui/event-logos";
 import { Wordmark } from "@/components/ui/wordmark";
 
 export function Shell({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
@@ -13,12 +12,7 @@ export function Shell({ children, wide = false }: { children: React.ReactNode; w
         {children}
       </main>
       <footer className="border-t-2 border-dashed border-ink/30 py-5">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-          <BrandLogo variant="grey" className="h-6 opacity-90" />
-          <span aria-hidden className="font-mono text-sm text-muted">×</span>
-          <GdgNashikLockup className="h-7" />
-        </div>
-        <p className="mt-3 font-mono text-xs text-muted">Your Tech. Your Path. · The track suggestion is guidance, not a career prediction.</p>
+        <p className="font-mono text-xs text-muted">Your Tech. Your Path. · The track suggestion is guidance, not a career prediction.</p>
       </footer>
     </div>
   );
