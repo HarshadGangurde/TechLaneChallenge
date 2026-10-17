@@ -11,6 +11,11 @@ const variants = {
 
 type Variant = keyof typeof variants;
 
+/** Class names for anything that should look like a button (e.g. a download link). */
+export function buttonClasses(variant: Variant = "primary", className = ""): string {
+  return `${base} ${variants[variant]} ${className}`;
+}
+
 export function Button({ variant = "primary", className = "", ...props }: ComponentProps<"button"> & { variant?: Variant; ref?: Ref<HTMLButtonElement> }) {
   return <button {...props} className={`${base} ${variants[variant]} ${className}`} />;
 }

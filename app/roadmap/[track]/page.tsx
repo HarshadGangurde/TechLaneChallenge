@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { RoadmapCta } from "@/components/roadmap/roadmap-cta";
+import { DownloadRoadmapButton } from "@/components/roadmap/download-button";
 import { RoadmapTracker } from "@/components/roadmap/roadmap-tracker";
 import { Shell } from "@/components/ui/shell";
 import { ROADMAPS } from "@/lib/roadmaps";
@@ -33,6 +34,8 @@ export default async function RoadmapPage({ params }: { params: Params }) {
           {track.name}
         </h1>
         <p className="mt-2 text-muted">{track.tagline} Here is a beginner-friendly path you can follow at your own pace, alongside college or work.</p>
+
+        <DownloadRoadmapButton trackId={id} className="mt-5 w-full sm:w-auto" />
 
         <h2 className="mt-8 font-mono text-xs font-bold uppercase tracking-[0.25em] text-muted">Where this can lead</h2>
         <p className="nb-card mt-3 p-4 font-medium">{track.careerPath}</p>
