@@ -2,6 +2,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, PDFFont, PDFPage, rgb, StandardFonts } from "pdf-lib";
+import { CONTACT } from "@/lib/constants";
 import { ROADMAPS } from "@/lib/roadmaps";
 import { getTrack } from "@/lib/tracks";
 import type { TrackId } from "@/types";
@@ -75,7 +76,7 @@ export async function buildRoadmapPdf(id: TrackId): Promise<Uint8Array> {
   pdf.setAuthor("DeboisTech");
   pdf.setSubject("Personalized beginner roadmap, DevFest Nashik 2026");
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const reg = await pdf.embedFont(StandardFonts.Helvetica);
+  const reg = bold; // all text is set in bold
   const logo = await pdf.embedPng(await asset("logo-dark.png"));
   const devfest = await pdf.embedPng(await asset("devfest-logo.png"));
 
@@ -204,12 +205,19 @@ export async function buildRoadmapPdf(id: TrackId): Promise<Uint8Array> {
 
   // ---- Closing panel
   {
-    const lines = wrap("Talk to the DeboisTech team about this path in a free consultation. Ask any team member at the DeboisTech zone.", reg, 11, CW - 32);
-    const h = 16 + 22 + lines.length * 15 + 18;
+    const lines = wrap("Talk to the DeboisTech team about this path in a free consultation. Ask any team member at the DeboisTech zone, or reach us here:", reg, 11, CW - 32);
+    const contacts: [string, string][] = [["Email", CONTACT.email], ["Phone", CONTACT.phone]];
+    const h = 16 + 22 + lines.length * 15 + 8 + contacts.length * 18 + 14;
     if (y - h < bottom) ({ page, y } = newPage());
     box(page, M, y, CW - 3, h, C.brand);
     page.drawText("Want help along the way?", { x: M + 16, y: y - 32, size: 16, font: bold, color: C.white });
     lines.forEach((l, k) => page.drawText(l, { x: M + 16, y: y - 54 - k * 15, size: 11, font: reg, color: C.white }));
+    let cy = y - 54 - lines.length * 15 - 8;
+    for (const [label, value] of contacts) {
+      page.drawText(`${label}:`, { x: M + 16, y: cy - 10, size: 11, font: bold, color: C.sun });
+      page.drawText(safe(value), { x: M + 70, y: cy - 10, size: 12, font: bold, color: C.white });
+      cy -= 18;
+    }
     y -= h + 14;
     for (const l of wrap("Paces are only a guide. Everyone starts from a different place, so go faster or slower as you need. This is a suggestion, not a career prediction.", reg, 8.5, CW)) {
       if (y - 12 < M + 14) ({ page, y } = newPage());

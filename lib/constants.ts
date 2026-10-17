@@ -9,6 +9,9 @@ export const AVAILABILITY_OPTIONS = [
   "Any time",
 ] as const;
 
+/** Staff contact details printed on materials such as the roadmap PDF. */
+export const CONTACT = { email: "inquiry@gmail.com", phone: "+91 8263830296" } as const;
+
 export const STATUS_LABELS = {
   college_student: "College student",
   graduate: "Graduate",
