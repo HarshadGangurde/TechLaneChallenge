@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, PDFFont, PDFPage, rgb } from "pdf-lib";
-import { CONTACT } from "@/lib/constants";
+import { COMPANY, CONTACT } from "@/lib/constants";
 import { ROADMAPS } from "@/lib/roadmaps";
 import { getTrack } from "@/lib/tracks";
 import type { TrackId } from "@/types";
@@ -213,8 +213,10 @@ export async function buildRoadmapPdf(id: TrackId): Promise<Uint8Array> {
   {
     const lines = wrap("Talk to the DeboisTech team about this path in a free consultation. Ask any team member at the DeboisTech zone.", body, 11, CW - 32);
     const h = 16 + 22 + lines.length * 15 + 18;
-    const contacts: [string, string][] = [["Email", CONTACT.email], ["Phone", CONTACT.phone]];
-    const contactH = 14 + 6 + contacts.length * 18;
+    const contacts: [string, string][] = [["Email:", CONTACT.email], ["Phone:", CONTACT.phone], ["Office Address:", CONTACT.address]];
+    const labelW = Math.max(...contacts.map(([l]) => mono.widthOfTextAtSize(l, 10))) + 12;
+    const addrLines = wrap(CONTACT.address, body, 12, CW - labelW);
+    const contactH = 14 + 6 + 2 * 18 + addrLines.length * 16;
     if (y - h - 16 - contactH < bottom) ({ page, y } = newPage());
     box(page, M, y, CW - 3, h, C.brand);
     page.drawText("Want help along the way?", { x: M + 16, y: y - 33, size: 18, font: display, color: C.white });
@@ -225,16 +227,17 @@ export async function buildRoadmapPdf(id: TrackId): Promise<Uint8Array> {
     page.drawText("CONTACT US", { x: M, y: y - 8, size: 8, font: mono, color: C.muted });
     y -= 22;
     for (const [label, value] of contacts) {
-      page.drawText(`${label}:`, { x: M, y: y - 10, size: 10, font: mono, color: C.brandStrong });
-      page.drawText(safe(value), { x: M + 52, y: y - 10, size: 12, font: body, color: C.ink });
-      y -= 18;
+      const lines = label === "Office Address:" ? addrLines : [safe(value)];
+      page.drawText(label, { x: M, y: y - 10, size: 10, font: mono, color: C.brandStrong });
+      lines.forEach((l, k) => page.drawText(l, { x: M + labelW, y: y - 10 - k * 16, size: 12, font: body, color: C.ink }));
+      y -= Math.max(18, lines.length * 16 + 2);
     }
   }
 
   // ---- Footers
   pages.forEach((p, i) => {
     p.drawLine({ start: { x: M, y: M + 14 }, end: { x: W - M, y: M + 14 }, thickness: 1, color: C.ink, opacity: 0.25, dashArray: [4, 3] });
-    p.drawText("Your Tech. Your Path.  |  deboistech  |  DevFest Nashik 2026", { x: M, y: M, size: 8, font: text, color: C.muted });
+    p.drawText(`${COMPANY.name}  |  ${COMPANY.website}`, { x: M, y: M, size: 8, font: text, color: C.muted });
     const label = `Page ${i + 1} of ${pages.length}`;
     p.drawText(label, { x: W - M - text.widthOfTextAtSize(label, 8), y: M, size: 8, font: text, color: C.muted });
   });

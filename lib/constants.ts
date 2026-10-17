@@ -10,7 +10,12 @@ export const AVAILABILITY_OPTIONS = [
 ] as const;
 
 /** Staff contact details printed on materials such as the roadmap PDF. */
-export const CONTACT = { email: "inquiry@gmail.com", phone: "+91 8263830296" } as const;
+export const CONTACT = {
+  email: "inquiry@gmail.com",
+  phone: "+91 8263830296",
+  address: "Third Floor, Roongta Mall, Uttam Nagar, Cidco, Nashik",
+} as const;
+export const COMPANY = { name: "Deboistech IT Solutions LLP", website: "www.deboistech.in" } as const;
 
 export const STATUS_LABELS = {
   college_student: "College student",
