@@ -17,6 +17,13 @@ export const CONTACT = {
 } as const;
 export const COMPANY = { name: "Deboistech IT Solutions LLP", website: "www.deboistech.in" } as const;
 
+export const SOCIAL_LINKS = {
+  website: "https://www.deboistech.in/",
+  instagram: "https://www.instagram.com/deboistech.in",
+  linkedin: "https://www.linkedin.com/company/deboistech",
+  x: "https://x.com/deboistech",
+} as const;
+
 export const STATUS_LABELS = {
   college_student: "College student",
   graduate: "Graduate",

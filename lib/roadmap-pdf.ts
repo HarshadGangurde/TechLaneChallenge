@@ -2,7 +2,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import fontkit from "@pdf-lib/fontkit";
-import { PDFDocument, PDFFont, PDFPage, rgb } from "pdf-lib";
+import { PDFArray, PDFDocument, PDFFont, PDFName, PDFPage, PDFString, rgb } from "pdf-lib";
 import { COMPANY, CONTACT } from "@/lib/constants";
 import { ROADMAPS } from "@/lib/roadmaps";
 import { getTrack } from "@/lib/tracks";
@@ -226,20 +226,47 @@ export async function buildRoadmapPdf(id: TrackId): Promise<Uint8Array> {
     // Contact details sit just below the panel, as plain text.
     page.drawText("CONTACT US", { x: M, y: y - 8, size: 8, font: mono, color: C.muted });
     y -= 22;
+    const hrefs: Record<string, string> = {
+      "Email:": `mailto:${CONTACT.email}`,
+      "Phone:": `tel:${CONTACT.phone.replace(/[^+\d]/g, "")}`,
+      "Office Address:": `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${COMPANY.name}, ${CONTACT.address}`)}`,
+    };
+    const link = (pg: PDFPage, x: number, yBase: number, w: number, uri: string) => {
+      const ctx = pdf.context;
+      const annot = ctx.obj({
+        Type: "Annot",
+        Subtype: "Link",
+        Rect: [x, yBase - 3, x + w, yBase + 11],
+        Border: [0, 0, 0],
+        A: { Type: "Action", S: "URI", URI: PDFString.of(uri) },
+      });
+      const ref = ctx.register(annot);
+      const existing = pg.node.lookup(PDFName.of("Annots"));
+      if (existing instanceof PDFArray) existing.push(ref);
+      else pg.node.set(PDFName.of("Annots"), ctx.obj([ref]));
+    };
     for (const [label, value] of contacts) {
       const lines = label === "Office Address:" ? addrLines : [safe(value)];
-      page.drawText(label, { x: M, y: y - 10, size: 10, font: mono, color: C.brandStrong });
-      lines.forEach((l, k) => page.drawText(l, { x: M + labelW, y: y - 10 - k * 16, size: 12, font: body, color: C.ink }));
-      y -= Math.max(18, lines.length * 16 + 2);
+      const base = y - 12;
+      page.drawText(label, { x: M, y: base, size: 10, font: mono, color: C.brandStrong });
+      lines.forEach((l, k) => {
+        const yy = base - k * 16;
+        const w = body.widthOfTextAtSize(l, 12);
+        page.drawText(l, { x: M + labelW, y: yy, size: 12, font: body, color: C.ink });
+        page.drawLine({ start: { x: M + labelW, y: yy - 2 }, end: { x: M + labelW + w, y: yy - 2 }, thickness: 0.6, color: C.brandStrong });
+        link(page, M + labelW, yy, w, hrefs[label]);
+      });
+      y -= Math.max(22, lines.length * 16 + 6);
     }
   }
 
   // ---- Footers
   pages.forEach((p, i) => {
     p.drawLine({ start: { x: M, y: M + 14 }, end: { x: W - M, y: M + 14 }, thickness: 1, color: C.ink, opacity: 0.25, dashArray: [4, 3] });
-    p.drawText(`${COMPANY.name}  |  ${COMPANY.website}`, { x: M, y: M, size: 8, font: text, color: C.muted });
+    p.drawText(`${COMPANY.name}  |  ${COMPANY.website}`, { x: M, y: M + 1, size: 8, font: text, color: C.muted });
+    p.drawText("\u00A9 2026 Deboistech. All rights reserved.", { x: M, y: M - 10, size: 8, font: text, color: C.muted });
     const label = `Page ${i + 1} of ${pages.length}`;
-    p.drawText(label, { x: W - M - text.widthOfTextAtSize(label, 8), y: M, size: 8, font: text, color: C.muted });
+    p.drawText(label, { x: W - M - text.widthOfTextAtSize(label, 8), y: M + 1, size: 8, font: text, color: C.muted });
   });
 
   return pdf.save();

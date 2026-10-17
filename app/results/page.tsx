@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Your Tech Lane | DeboisTech" };
 
 export default function ResultsPage() {
   return (
-    <Shell>
+    <Shell fixedBar>
       <Results />
     </Shell>
   );

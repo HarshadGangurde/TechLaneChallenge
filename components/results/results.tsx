@@ -43,7 +43,7 @@ export function Results() {
   const others = TRACK_LIST.filter((t) => t.id !== rec.primary && t.id !== rec.secondary);
 
   return (
-    <div className="pb-40 pt-2">
+    <div className="pb-4 pt-2">
       <p className="font-mono text-sm uppercase tracking-widest text-brand-strong">Your suggested tech lane</p>
       <h1 className="sr-only">Your track recommendation</h1>
 
@@ -76,10 +76,7 @@ export function Results() {
         </div>
       </section>
 
-      <p className="mt-6 text-xs text-muted">
-        Based on a short, rule-based quiz. It is guidance to help you explore, not a prediction of your career or ability.
-      </p>
-      <Button variant="ghost" className="mt-2" onClick={() => session.resetChallenge()}>
+      <Button variant="ghost" className="mt-6" onClick={() => session.resetChallenge()}>
         Retake the challenge
       </Button>
 
@@ -88,16 +85,11 @@ export function Results() {
           <p aria-live="polite" className="text-sm text-muted sm:max-w-xs">
             {selected ? <>Your track: <strong className="text-ink">{getTrack(selected).name}</strong></> : "Choose a track above to unlock your free consultation request."}
           </p>
-          <div className="grid grid-cols-[3fr_2fr] gap-2 sm:flex sm:shrink-0">
-            <ButtonLink href={`/roadmap/${rec.primary}`} variant="secondary" className="px-2 text-[13px] leading-tight sm:px-6 sm:text-base">
-              Get your personalized roadmap
-            </ButtonLink>
-            {selected ? (
-              <ButtonLink href="/consultation" className="px-2 text-[13px] leading-tight sm:px-6 sm:text-base">Request Free Consultation</ButtonLink>
-            ) : (
-              <Button disabled aria-disabled="true" className="px-2 text-[13px] leading-tight sm:px-6 sm:text-base">Request Free Consultation</Button>
-            )}
-          </div>
+          {selected ? (
+            <ButtonLink href="/consultation" className="px-4 sm:px-6">Request Free Consultation</ButtonLink>
+          ) : (
+            <Button disabled aria-disabled="true" className="px-4 sm:px-6">Request Free Consultation</Button>
+          )}
         </div>
       </div>
     </div>

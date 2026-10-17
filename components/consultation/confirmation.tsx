@@ -11,11 +11,12 @@ export function Confirmation() {
   const raw = useAnswersRaw();
   const questions = useQuestionSet();
   const selected = useSelectedTrack();
-  // Roadmap for the track the quiz suggested; falls back to the chosen track if the quiz answers are gone.
+  // Roadmap for the track the student chose; falls back to the suggested one if no choice is stored.
   const roadmapTrack = useMemo(() => {
+    if (selected) return selected;
     const answers = parseAnswers(raw);
     if (questions && questions.length && questions.every((q) => answers[q.id])) return recommend(answers, questions).primary;
-    return selected ?? null;
+    return null;
   }, [raw, questions, selected]);
   if (leadId === undefined) return <div className="mt-10 h-48 animate-pulse rounded-2xl bg-panel" aria-label="Loading" />;
 
