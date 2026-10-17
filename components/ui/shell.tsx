@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { Wordmark } from "@/components/ui/wordmark";
 
 export function Shell({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
@@ -12,8 +13,9 @@ export function Shell({ children, wide = false }: { children: React.ReactNode; w
       <main id="main" className="flex-1 pb-10">
         {children}
       </main>
-      <footer className="border-t-2 border-dashed border-ink/30 py-5 font-mono text-xs text-muted">
-        Your Tech. Your Path. · The track suggestion is guidance, not a career prediction.
+      <footer className="border-t-2 border-dashed border-ink/30 py-5">
+        <BrandLogo variant="grey" className="h-6 opacity-90" />
+        <p className="mt-3 font-mono text-xs text-muted">Your Tech. Your Path. · The track suggestion is guidance, not a career prediction.</p>
       </footer>
     </div>
   );

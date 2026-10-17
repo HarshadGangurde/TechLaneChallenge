@@ -1,5 +1,6 @@
 import { LandingTracker } from "@/components/landing/landing-tracker";
 import { LaneCard } from "@/components/landing/lane-card";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { PixelDoodle } from "@/components/landing/pixel-doodle";
 import { ButtonLink } from "@/components/ui/button";
 import { Shell } from "@/components/ui/shell";
@@ -93,10 +94,11 @@ export default function Home() {
         </ul>
       </section>
 
-      <section className="nb-card mt-12 flex flex-col items-start gap-4 bg-brand p-6 text-white">
+      <section className="nb-card mt-12 flex flex-col items-start gap-4 bg-ink! p-6 text-white">
+        <BrandLogo variant="white" className="h-7" />
         <h2 className="font-display text-3xl font-extrabold leading-tight">Ready to find your lane?</h2>
-        <p className="font-medium text-white">It takes about three minutes. Your result is yours, no contact details needed.</p>
-        <ButtonLink href="/challenge" variant="secondary" className="text-lg">
+        <p className="font-medium text-paper/85">It takes about three minutes. Your result is yours, no contact details needed.</p>
+        <ButtonLink href="/challenge" variant="secondary" className="text-lg shadow-[4px_4px_0_0_#2c8441]">
           Start Challenge →
         </ButtonLink>
       </section>

@@ -1,13 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 export function Wordmark() {
   return (
-    <Link href="/" className="inline-flex min-h-11 items-center gap-2 font-display text-xl font-extrabold tracking-tight" aria-label="DeboisTech home">
-      <Image src="/logo.png" alt="" width={54} height={32} priority className="h-8 w-auto" />
-      <span>
-        Debois<span className="text-brand-strong">Tech</span>
-      </span>
+    <Link href="/" className="inline-flex min-h-11 items-center" aria-label="DeboisTech home">
+      <BrandLogo variant="dark" className="h-8 sm:h-9" priority />
     </Link>
   );
 }
