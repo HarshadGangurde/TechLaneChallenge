@@ -17,7 +17,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tra
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="DeboisTech-${track}-roadmap.pdf"`,
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "no-cache",
     },
   });
 }
