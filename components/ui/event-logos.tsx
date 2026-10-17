@@ -1,8 +1,8 @@
 import Image from "next/image";
 
-/** Official DevFest Nashik 2026 mark, as published on the event site. */
+/** DevFest Nashik 2026 mark. */
 export function DevFestMark({ className = "h-8" }: { className?: string }) {
-  return <Image src="/devfest-logo.svg" alt="DevFest Nashik 2026" width={638} height={182} className={`${className} w-auto`} />;
+  return <Image src="/devfest-logo.png" alt="DevFest Nashik 2026" width={640} height={183} className={`${className} w-auto`} priority />;
 }
 
 /** Google Developer Groups Nashik lockup (the event's organiser). */
