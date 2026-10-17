@@ -12,6 +12,8 @@ export const ANALYTICS_EVENTS = [
   "consultation_form_opened",
   "consultation_submitted",
   "consultation_save_failed",
+  "roadmap_viewed",
+  "roadmap_downloaded",
 ] as const;
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
 

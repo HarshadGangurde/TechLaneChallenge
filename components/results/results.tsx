@@ -43,7 +43,7 @@ export function Results() {
   const others = TRACK_LIST.filter((t) => t.id !== rec.primary && t.id !== rec.secondary);
 
   return (
-    <div className="pb-32 pt-2">
+    <div className="pb-4 pt-2">
       <p className="font-mono text-sm uppercase tracking-widest text-brand-strong">Your suggested tech lane</p>
       <h1 className="sr-only">Your track recommendation</h1>
 
@@ -76,22 +76,19 @@ export function Results() {
         </div>
       </section>
 
-      <p className="mt-6 text-xs text-muted">
-        Based on a short, rule-based quiz. It is guidance to help you explore, not a prediction of your career or ability.
-      </p>
-      <Button variant="ghost" className="mt-2" onClick={() => session.resetChallenge()}>
+      <Button variant="ghost" className="mt-6" onClick={() => session.resetChallenge()}>
         Retake the challenge
       </Button>
 
       <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper/95 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p aria-live="polite" className="text-sm text-muted">
+        <div className="mx-auto flex max-w-4xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+          <p aria-live="polite" className="text-sm text-muted sm:max-w-xs">
             {selected ? <>Your track: <strong className="text-ink">{getTrack(selected).name}</strong></> : "Choose a track above to unlock your free consultation request."}
           </p>
           {selected ? (
-            <ButtonLink href="/consultation" className="sm:min-w-64">Request Free Consultation →</ButtonLink>
+            <ButtonLink href="/consultation" className="px-4 sm:px-6">Request Free Consultation</ButtonLink>
           ) : (
-            <Button disabled aria-disabled="true" className="sm:min-w-64">Request Free Consultation</Button>
+            <Button disabled aria-disabled="true" className="px-4 sm:px-6">Request Free Consultation</Button>
           )}
         </div>
       </div>

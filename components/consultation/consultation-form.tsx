@@ -154,7 +154,7 @@ export function ConsultationForm() {
           {(p) => <input {...p} className={inputClass} value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" maxLength={100} />}
         </Field>
 
-        <Field id="phone" label="Mobile number with country code" required error={errors.phone} hint="Example: +91 98765 43210">
+        <Field id="phone" label="Mobile number with country code" required error={errors.phone}>
           {(p) => <input {...p} className={inputClass} type="tel" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" placeholder="+91 " maxLength={24} />}
         </Field>
 

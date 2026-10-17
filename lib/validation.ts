@@ -45,7 +45,7 @@ export const leadPayloadSchema = z.object({
       if (!n) {
         ctx.addIssue({
           code: "custom",
-          message: "Enter a valid mobile number with country code, e.g. +91 98765 43210.",
+          message: "Enter a valid mobile number with country code.",
         });
         return z.NEVER;
       }
