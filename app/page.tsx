@@ -27,7 +27,7 @@ export default function Home() {
     <Shell>
       <LandingTracker />
       <section className="animate-rise relative pt-6 sm:pt-12">
-        <PixelDoodle className="animate-bob pointer-events-none absolute -top-2 right-0 w-20 sm:w-32" />
+        <PixelDoodle className="animate-bob pointer-events-none absolute top-1 right-0 w-20 sm:w-32" />
         <p className="pr-24 font-mono text-xs font-bold uppercase tracking-[0.2em] text-muted">Find your tech lane</p>
         <h1 className="mt-4 font-display text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-8xl">
           YOUR TECH.
