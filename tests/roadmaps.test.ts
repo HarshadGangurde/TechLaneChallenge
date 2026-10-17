@@ -15,6 +15,16 @@ describe("roadmaps", () => {
       }
     }
   });
+  it("fits every roadmap into eight weeks, in four consecutive two-week stages", () => {
+    for (const id of TRACK_IDS) {
+      const ranges = ROADMAPS[id].map((s) => {
+        const m = /^Weeks (\d+)–(\d+)$/.exec(s.pace);
+        expect(m, `${id} ${s.pace}`).not.toBeNull();
+        return [Number(m![1]), Number(m![2])];
+      });
+      expect(ranges, id).toEqual([[1, 2], [3, 4], [5, 6], [7, 8]]);
+    }
+  });
   it("avoids fees, placement and guarantee claims", () => {
     const text = JSON.stringify(ROADMAPS).toLowerCase();
     expect(text).not.toContain("₹");

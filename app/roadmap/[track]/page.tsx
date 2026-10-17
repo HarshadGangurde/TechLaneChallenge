@@ -33,7 +33,7 @@ export default async function RoadmapPage({ params }: { params: Params }) {
           <span aria-hidden className="mr-2">{track.emoji}</span>
           {track.name}
         </h1>
-        <p className="mt-2 text-muted">{track.tagline} Here is a beginner-friendly path you can follow at your own pace, alongside college or work.</p>
+        <p className="mt-2 text-muted">{track.tagline} Here is a beginner-friendly 8-week path you can follow at your own pace, alongside college or work.</p>
 
         <DownloadRoadmapButton trackId={id} className="mt-5 w-full sm:w-auto" />
 
