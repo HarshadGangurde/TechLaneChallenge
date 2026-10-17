@@ -205,20 +205,32 @@ export async function buildRoadmapPdf(id: TrackId): Promise<Uint8Array> {
 
   // ---- Closing panel
   {
-    const lines = wrap("Talk to the DeboisTech team about this path in a free consultation. Ask any team member at the DeboisTech zone, or reach us here:", reg, 11, CW - 32);
+    const lines = wrap("Talk to the DeboisTech team about this path in a free consultation. Ask any team member at the DeboisTech zone.", reg, 11, CW - 32);
+    const h = 16 + 22 + lines.length * 15 + 18;
     const contacts: [string, string][] = [["Email", CONTACT.email], ["Phone", CONTACT.phone]];
-    const h = 16 + 22 + lines.length * 15 + 8 + contacts.length * 18 + 14;
-    if (y - h < bottom) ({ page, y } = newPage());
+    const chipsH = 14 + 22 + 16; // label + chips + gap
+    if (y - h - chipsH < bottom) ({ page, y } = newPage());
     box(page, M, y, CW - 3, h, C.brand);
     page.drawText("Want help along the way?", { x: M + 16, y: y - 32, size: 16, font: bold, color: C.white });
     lines.forEach((l, k) => page.drawText(l, { x: M + 16, y: y - 54 - k * 15, size: 11, font: reg, color: C.white }));
-    let cy = y - 54 - lines.length * 15 - 8;
+    y -= h + 16;
+
+    // Contact details sit just below the panel.
+    page.drawText("CONTACT US", { x: M, y: y - 8, size: 8, font: bold, color: C.muted });
+    y -= 18;
+    let x = M;
     for (const [label, value] of contacts) {
-      page.drawText(`${label}:`, { x: M + 16, y: cy - 10, size: 11, font: bold, color: C.sun });
-      page.drawText(safe(value), { x: M + 70, y: cy - 10, size: 12, font: bold, color: C.white });
-      cy -= 18;
+      const text = safe(value);
+      const lw = bold.widthOfTextAtSize(`${label}:`, 10);
+      const w = 12 + lw + 8 + bold.widthOfTextAtSize(text, 12) + 12;
+      page.drawRectangle({ x: x + 2, y: y - 22 - 2, width: w, height: 22, color: C.ink });
+      page.drawRectangle({ x, y: y - 22, width: w, height: 22, color: C.white, borderColor: C.ink, borderWidth: 1.2 });
+      page.drawText(`${label}:`, { x: x + 12, y: y - 15, size: 10, font: bold, color: C.brandStrong });
+      page.drawText(text, { x: x + 12 + lw + 8, y: y - 15.5, size: 12, font: bold, color: C.ink });
+      x += w + 14;
     }
-    y -= h + 14;
+    y -= 22 + 18;
+
     for (const l of wrap("Paces are only a guide. Everyone starts from a different place, so go faster or slower as you need. This is a suggestion, not a career prediction.", reg, 8.5, CW)) {
       if (y - 12 < M + 14) ({ page, y } = newPage());
       page.drawText(l, { x: M, y: y - 8, size: 8.5, font: reg, color: C.muted });
