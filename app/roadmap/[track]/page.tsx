@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { RoadmapCta } from "@/components/roadmap/roadmap-cta";
 import { RoadmapTracker } from "@/components/roadmap/roadmap-tracker";
-import { ButtonLink } from "@/components/ui/button";
 import { Shell } from "@/components/ui/shell";
 import { ROADMAPS } from "@/lib/roadmaps";
 import { getTrack, isTrackId, TRACK_LIST } from "@/lib/tracks";
@@ -75,14 +75,7 @@ export default async function RoadmapPage({ params }: { params: Params }) {
           Paces are only a guide. Everyone starts from a different place, so go faster or slower as you need. This is a suggestion, not a career prediction.
         </p>
 
-        <section className="nb-card mt-8 flex flex-col items-start gap-4 bg-brand p-6 text-white">
-          <h2 className="font-display text-2xl font-extrabold leading-tight">Want help along the way?</h2>
-          <p className="font-medium text-white">Talk to the DeboisTech team about this path in a free consultation.</p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/consultation" variant="secondary">Request Free Consultation</ButtonLink>
-            <ButtonLink href="/results" variant="secondary">← Back to my results</ButtonLink>
-          </div>
-        </section>
+        <RoadmapCta />
       </section>
     </Shell>
   );
